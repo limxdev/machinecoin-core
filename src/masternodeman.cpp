@@ -1023,7 +1023,7 @@ bool CMasternodeMan::SendVerifyRequest(const CAddress& addr, const std::vector<C
         return false;
     }
 
-    CNode* pnode = connman->ConnectNode(addr, nullptr, false, true);
+    /*CNode* pnode = connman->ConnectNode(addr, nullptr, false, true);
     if(pnode == nullptr) {
         LogPrint(MCLog::MN, "CMasternodeMan::SendVerifyRequest -- can't connect to node to verify it, addr=%s\n", addr.ToString());
         return false;
@@ -1037,7 +1037,7 @@ bool CMasternodeMan::SendVerifyRequest(const CAddress& addr, const std::vector<C
     
     const CNetMsgMaker msgMaker(pnode->GetSendVersion());
     connman->PushMessage(pnode, msgMaker.Make(NetMsgType::MNVERIFY, mnv));
-    // connman->PushMessage(pnode, NetMsgType::MNVERIFY, mnv);
+    // connman->PushMessage(pnode, NetMsgType::MNVERIFY, mnv);*/
 
     return true;
 }
