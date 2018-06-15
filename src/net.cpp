@@ -385,8 +385,12 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
         CNode* pnode = FindNode((CService)addrConnect);
         if (pnode)
         {
+            if(fConnectToMasternode) {
+                LogPrintf("Flagging node as masternode\n");
+                pnode->fMasternode = true;
+            }
             LogPrintf("Failed to open new connection, already connected\n");
-            return nullptr;
+            return pnode;
         }
     }
 
@@ -413,9 +417,13 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
             CNode* pnode = FindNode((CService)addrConnect);
             if (pnode)
             {
+                if(fConnectToMasternode) {
+                    LogPrintf("Flagging node as masternode\n");
+                    pnode->fMasternode = true;
+                }
                 pnode->MaybeSetAddrName(std::string(pszDest));
                 LogPrintf("Failed to open new connection, already connected\n");
-                return nullptr;
+                return pnode;
             }
         }
     }
