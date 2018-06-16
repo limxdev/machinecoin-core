@@ -123,7 +123,7 @@ class ReplaceByFeeTest(MachinecoinTestFramework):
 
         tx1a = CTransaction()
         tx1a.vin = [CTxIn(tx0_outpoint, nSequence=0)]
-        tx1a.vout = [CTxOut(1*COIN, CScript([b'a']))]
+        tx1a.vout = [CTxOut(1 * COIN, CScript([b'a' * 35]))]
         tx1a_hex = txToHex(tx1a)
         tx1a_txid = self.nodes[0].sendrawtransaction(tx1a_hex, True)
 
@@ -132,7 +132,7 @@ class ReplaceByFeeTest(MachinecoinTestFramework):
         # Should fail because we haven't changed the fee
         tx1b = CTransaction()
         tx1b.vin = [CTxIn(tx0_outpoint, nSequence=0)]
-        tx1b.vout = [CTxOut(1*COIN, CScript([b'b']))]
+        tx1b.vout = [CTxOut(1 * COIN, CScript([b'b' * 35]))]
         tx1b_hex = txToHex(tx1b)
 
         # This will raise an exception due to insufficient fee
@@ -143,7 +143,7 @@ class ReplaceByFeeTest(MachinecoinTestFramework):
         # Extra 0.1 MAC fee
         tx1b = CTransaction()
         tx1b.vin = [CTxIn(tx0_outpoint, nSequence=0)]
-        tx1b.vout = [CTxOut(int(0.9*COIN), CScript([b'b']))]
+        tx1b.vout = [CTxOut(int(0.9 * COIN), CScript([b'b' * 35]))]
         tx1b_hex = txToHex(tx1b)
         # Replacement still disabled even with "enough fee"
         assert_raises_rpc_error(-26, "txn-mempool-conflict", self.nodes[1].sendrawtransaction, tx1b_hex, True)
@@ -185,7 +185,7 @@ class ReplaceByFeeTest(MachinecoinTestFramework):
         # child fees - 40 MAC - so this attempt is rejected.
         dbl_tx = CTransaction()
         dbl_tx.vin = [CTxIn(tx0_outpoint, nSequence=0)]
-        dbl_tx.vout = [CTxOut(initial_nValue - 30*COIN, CScript([1]))]
+        dbl_tx.vout = [CTxOut(initial_nValue - 30 * COIN, CScript([1] * 35))]
         dbl_tx_hex = txToHex(dbl_tx)
 
         # This will raise an exception due to insufficient fee
@@ -255,7 +255,7 @@ class ReplaceByFeeTest(MachinecoinTestFramework):
         # 1 MAC fee is enough
         dbl_tx = CTransaction()
         dbl_tx.vin = [CTxIn(tx0_outpoint, nSequence=0)]
-        dbl_tx.vout = [CTxOut(initial_nValue - fee*n - 1*COIN, CScript([1]))]
+        dbl_tx.vout = [CTxOut(initial_nValue - fee * n - 1 * COIN, CScript([1] * 35))]
         dbl_tx_hex = txToHex(dbl_tx)
         self.nodes[0].sendrawtransaction(dbl_tx_hex, True)
 
@@ -493,7 +493,7 @@ class ReplaceByFeeTest(MachinecoinTestFramework):
 
         tx1a = CTransaction()
         tx1a.vin = [CTxIn(tx0_outpoint, nSequence=0)]
-        tx1a.vout = [CTxOut(1*COIN, CScript([b'a']))]
+        tx1a.vout = [CTxOut(1 * COIN, CScript([b'a' * 35]))]
         tx1a_hex = txToHex(tx1a)
         tx1a_txid = self.nodes[0].sendrawtransaction(tx1a_hex, True)
 
@@ -519,14 +519,14 @@ class ReplaceByFeeTest(MachinecoinTestFramework):
 
         tx2a = CTransaction()
         tx2a.vin = [CTxIn(tx1_outpoint, nSequence=0)]
-        tx2a.vout = [CTxOut(1*COIN, CScript([b'a']))]
+        tx2a.vout = [CTxOut(1 * COIN, CScript([b'a' * 35]))]
         tx2a_hex = txToHex(tx2a)
         self.nodes[0].sendrawtransaction(tx2a_hex, True)
 
         # Lower fee, but we'll prioritise it
         tx2b = CTransaction()
         tx2b.vin = [CTxIn(tx1_outpoint, nSequence=0)]
-        tx2b.vout = [CTxOut(int(1.01*COIN), CScript([b'a']))]
+        tx2b.vout = [CTxOut(int(1.01 * COIN), CScript([b'a' * 35]))]
         tx2b.rehash()
         tx2b_hex = txToHex(tx2b)
 
