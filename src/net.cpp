@@ -385,7 +385,7 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
         CNode* pnode = FindNode((CService)addrConnect);
         if (pnode)
         {
-            if(fConnectToMasternode) {
+            if(fConnectToMasternode && !pnode->fMasternode) {
                 LogPrintf("Flagging node as masternode\n");
                 pnode->fMasternode = true;
             }
@@ -417,7 +417,7 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
             CNode* pnode = FindNode((CService)addrConnect);
             if (pnode)
             {
-                if(fConnectToMasternode) {
+                if(fConnectToMasternode && !pnode->fMasternode) {
                     LogPrintf("Flagging node as masternode\n");
                     pnode->fMasternode = true;
                 }
@@ -1994,7 +1994,7 @@ void CConnman::ThreadMnbRequestConnections()
         std::pair<CService, std::set<uint256> > p = mnodeman.PopScheduledMnbRequestConnection();
         if(p.first == CService() || p.second.empty()) continue;
 
-        OpenNetworkConnection(CAddress(p.first, NODE_NETWORK), false, &grant, nullptr, false, false, false, true, p.second);
+        //OpenNetworkConnection(CAddress(p.first, NODE_NETWORK|NODE_WITNESS), false, &grant, nullptr, false, false, false, true, p.second);
         if (!interruptNet.sleep_for(std::chrono::milliseconds(1000)))
             return;
     }
