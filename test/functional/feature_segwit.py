@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Copyright (c) 2016-2017 The Machinecoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -218,7 +218,7 @@ class SegWitTest(MachinecoinTestFramework):
         # Now create tx2, which will spend from txid1.
         tx = CTransaction()
         tx.vin.append(CTxIn(COutPoint(int(txid1, 16), 0), b''))
-        tx.vout.append(CTxOut(int(49.99*COIN), CScript([OP_TRUE])))
+        tx.vout.append(CTxOut(int(49.99 * COIN), CScript([OP_TRUE, OP_DROP] * 15 + [OP_TRUE])))
         tx2_hex = self.nodes[0].signrawtransaction(ToHex(tx))['hex']
         txid2 = self.nodes[0].sendrawtransaction(tx2_hex)
         tx = FromHex(CTransaction(), tx2_hex)

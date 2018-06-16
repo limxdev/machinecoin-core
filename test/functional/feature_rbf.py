@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Copyright (c) 2014-2017 The Machinecoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -430,7 +430,7 @@ class ReplaceByFeeTest(MachinecoinTestFramework):
         # Shouldn't be able to double-spend
         tx1b = CTransaction()
         tx1b.vin = [CTxIn(tx0_outpoint, nSequence=0)]
-        tx1b.vout = [CTxOut(int(0.9*COIN), CScript([b'b']))]
+        tx1b.vout = [CTxOut(int(0.9 * COIN), CScript([b'b' * 35]))]
         tx1b_hex = txToHex(tx1b)
 
         # This will raise an exception

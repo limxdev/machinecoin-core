@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Copyright (c) 2017 The Machinecoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -57,17 +57,17 @@ class MultiWalletTest(MachinecoinTestFramework):
         self.assert_start_raises_init_error(0, ['-walletdir=' + not_a_dir], 'Error: Specified -walletdir "' + not_a_dir + '" is not a directory')
 
         self.log.info("Do not allow -zapwallettxes with multiwallet")
-        self.nodes[0].assert_start_raises_init_error(['-zapwallettxes', '-wallet=w1', '-wallet=w2'], "Error: -zapwallettxes is only allowed with a single wallet file")
-        self.nodes[0].assert_start_raises_init_error(['-zapwallettxes=1', '-wallet=w1', '-wallet=w2'], "Error: -zapwallettxes is only allowed with a single wallet file")
-        self.nodes[0].assert_start_raises_init_error(['-zapwallettxes=2', '-wallet=w1', '-wallet=w2'], "Error: -zapwallettxes is only allowed with a single wallet file")
+        self.assert_start_raises_init_error(0, ['-zapwallettxes', '-wallet=w1', '-wallet=w2'], "Error: -zapwallettxes is only allowed with a single wallet file")
+        self.assert_start_raises_init_error(0, ['-zapwallettxes=1', '-wallet=w1', '-wallet=w2'], "Error: -zapwallettxes is only allowed with a single wallet file")
+        self.assert_start_raises_init_error(0, ['-zapwallettxes=2', '-wallet=w1', '-wallet=w2'], "Error: -zapwallettxes is only allowed with a single wallet file")
 
         self.log.info("Do not allow -salvagewallet with multiwallet")
-        self.nodes[0].assert_start_raises_init_error(['-salvagewallet', '-wallet=w1', '-wallet=w2'], "Error: -salvagewallet is only allowed with a single wallet file")
-        self.nodes[0].assert_start_raises_init_error(['-salvagewallet=1', '-wallet=w1', '-wallet=w2'], "Error: -salvagewallet is only allowed with a single wallet file")
+        self.assert_start_raises_init_error(0, ['-salvagewallet', '-wallet=w1', '-wallet=w2'], "Error: -salvagewallet is only allowed with a single wallet file")
+        self.assert_start_raises_init_error(0, ['-salvagewallet=1', '-wallet=w1', '-wallet=w2'], "Error: -salvagewallet is only allowed with a single wallet file")
 
         self.log.info("Do not allow -upgradewallet with multiwallet")
-        self.nodes[0].assert_start_raises_init_error(['-upgradewallet', '-wallet=w1', '-wallet=w2'], "Error: -upgradewallet is only allowed with a single wallet file")
-        self.nodes[0].assert_start_raises_init_error(['-upgradewallet=1', '-wallet=w1', '-wallet=w2'], "Error: -upgradewallet is only allowed with a single wallet file")
+        self.assert_start_raises_init_error(0, ['-upgradewallet', '-wallet=w1', '-wallet=w2'], "Error: -upgradewallet is only allowed with a single wallet file")
+        self.assert_start_raises_init_error(0, ['-upgradewallet=1', '-wallet=w1', '-wallet=w2'], "Error: -upgradewallet is only allowed with a single wallet file")
 
         # if wallets/ doesn't exist, datadir should be the default wallet dir
         wallet_dir2 = data_dir('walletdir')
