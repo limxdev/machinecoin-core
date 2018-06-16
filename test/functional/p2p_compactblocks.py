@@ -12,7 +12,8 @@ from test_framework.mininode import *
 from test_framework.test_framework import MachinecoinTestFramework
 from test_framework.util import *
 from test_framework.blocktools import create_block, create_coinbase, add_witness_commitment
-from test_framework.script import CScript, OP_TRUE
+from test_framework.script import CScript, OP_TRUE, OP_DROP
+
 
 # TestNode: A peer we use to send messages to machinecoind, and store responses.
 class TestNode(P2PInterface):
