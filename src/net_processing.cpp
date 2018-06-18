@@ -916,14 +916,6 @@ void PeerLogicValidation::InitializeCurrentBlockTip() {
 }
 
 void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
-    masternodeSync.UpdatedBlockTip(pindexNew, fInitialDownload, connman);
-
-    if (!fInitialDownload) {
-        mnodeman.UpdatedBlockTip(pindexNew);
-        mnpayments.UpdatedBlockTip(pindexNew, connman);
-        governance.UpdatedBlockTip(pindexNew, connman);
-    }
-
     const int nNewHeight = pindexNew->nHeight;
     connman->SetBestHeight(nNewHeight);
 
@@ -952,6 +944,14 @@ void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CB
     }
 
     nTimeBestReceived = GetTime();
+  
+    masternodeSync.UpdatedBlockTip(pindexNew, fInitialDownload, connman);
+
+    if (!fInitialDownload) {
+        mnodeman.UpdatedBlockTip(pindexNew);
+        mnpayments.UpdatedBlockTip(pindexNew, connman);
+        governance.UpdatedBlockTip(pindexNew, connman);
+    }
 }
 
 void PeerLogicValidation::BlockChecked(const CBlock& block, const CValidationState& state) {
