@@ -2000,6 +2000,7 @@ void CConnman::ThreadMnbRequestConnections()
         LOCK(cs_vNodes);
         //CNode *pnode = FindNode(p.first);
         CNode* pnode = FindNode((CService)CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)));
+        if(!pnode || pnode->fDisconnect) continue;
 
         const CNetMsgMaker msgMaker(pnode->GetSendVersion());
         // compile request vector
