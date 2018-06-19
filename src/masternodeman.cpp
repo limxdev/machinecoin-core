@@ -1037,7 +1037,6 @@ bool CMasternodeMan::SendVerifyRequest(const CAddress& addr, const std::vector<C
     
     const CNetMsgMaker msgMaker(pnode->GetSendVersion());
     connman->PushMessage(pnode, msgMaker.Make(NetMsgType::MNVERIFY, mnv));
-    // connman->PushMessage(pnode, NetMsgType::MNVERIFY, mnv);
 
     return true;
 }
