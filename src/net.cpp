@@ -2004,11 +2004,11 @@ void CConnman::ThreadMnbRequestConnections()
         const CNetMsgMaker msgMaker(pnode->GetSendVersion());
         // compile request vector
         std::vector<CInv> vToFetch;
-        std::set<uint256>::iterator it = second.begin();
-        while(it != second.end()) {
+        std::set<uint256>::iterator it = p.second.begin();
+        while(it != p.second.end()) {
             if(*it != uint256()) {
                 vToFetch.push_back(CInv(MSG_MASTERNODE_ANNOUNCE, *it));
-                LogPrint(MCLog::MN, "ThreadMnbRequestConnections -- asking for mnb %s from addr=%s\n", it->ToString(), addrConnect.ToStringIPPort());
+                LogPrint(MCLog::MN, "ThreadMnbRequestConnections -- asking for mnb %s from addr=%s\n", it->ToString(), CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)).ToStringIPPort());
             }
             ++it;
         }
