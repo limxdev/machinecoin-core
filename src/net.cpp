@@ -1996,6 +1996,26 @@ void CConnman::ThreadMnbRequestConnections()
         if(p.first == CService() || p.second.empty()) continue;
 
         OpenNetworkConnection(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), false, &grant, nullptr, false, false, false, true, p.second);
+        
+        LOCK(cs_vNodes);
+        //CNode *pnode = FindNode(p.first);
+        CNode* pnode = FindNode((CService)CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)));
+
+        const CNetMsgMaker msgMaker(pnode->GetSendVersion());
+        // compile request vector
+        std::vector<CInv> vToFetch;
+        std::set<uint256>::iterator it = second.begin();
+        while(it != second.end()) {
+            if(*it != uint256()) {
+                vToFetch.push_back(CInv(MSG_MASTERNODE_ANNOUNCE, *it));
+                LogPrint(MCLog::MN, "ThreadMnbRequestConnections -- asking for mnb %s from addr=%s\n", it->ToString(), addrConnect.ToStringIPPort());
+            }
+            ++it;
+        }
+
+        // ask for data
+        PushMessage(pnode, msgMaker.Make(NetMsgType::GETDATA, vToFetch));
+        
         if (!interruptNet.sleep_for(std::chrono::milliseconds(1000)))
             return;
     }
@@ -2044,23 +2064,6 @@ void CConnman::OpenNetworkConnection(const CAddress& addrConnect, bool fCountFai
     {
         LOCK(cs_vNodes);
         vNodes.push_back(pnode);
-        
-        if (fMasternode == true) {
-            const CNetMsgMaker msgMaker(pnode->GetSendVersion());
-            // compile request vector
-            std::vector<CInv> vToFetch;
-            std::set<uint256>::iterator it = second.begin();
-            while(it != second.end()) {
-                if(*it != uint256()) {
-                    vToFetch.push_back(CInv(MSG_MASTERNODE_ANNOUNCE, *it));
-                    LogPrint(MCLog::MN, "ThreadMnbRequestConnections -- asking for mnb %s from addr=%s\n", it->ToString(), addrConnect.ToStringIPPort());
-                }
-                ++it;
-            }
-
-            // ask for data
-            PushMessage(pnode, msgMaker.Make(NetMsgType::GETDATA, vToFetch));
-        }
     }
 }
 
