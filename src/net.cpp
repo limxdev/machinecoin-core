@@ -2017,8 +2017,8 @@ void CConnman::ThreadMnbRequestConnections()
         // ask for data
         PushMessage(pnode, msgMaker.Make(NetMsgType::GETDATA, vToFetch));
         
-        if (!interruptNet.sleep_for(std::chrono::milliseconds(1000)))
-            return;
+        /*if (!interruptNet.sleep_for(std::chrono::milliseconds(1000)))
+            return;*/
     }
 }
 
