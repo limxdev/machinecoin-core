@@ -1995,7 +1995,9 @@ void CConnman::ThreadMnbRequestConnections()
         std::pair<CService, std::set<uint256> > p = mnodeman.PopScheduledMnbRequestConnection();
         if(p.first == CService() || p.second.empty()) continue;
 
-        OpenNetworkConnection(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), false, &grant, nullptr, false, false, false, true, p.second);
+        //OpenNetworkConnection(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), false, &grant, nullptr, false, false, false, true, p.second);
+        ConnectNode(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), nullptr, false, true);
+        
         
         LOCK(cs_vNodes);
         //CNode *pnode = FindNode(p.first);
