@@ -382,6 +382,7 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
             return nullptr;
 
         // Look for an existing connection
+        LOCK(cs_vNodes);
         CNode* pnode = FindNode((CService)addrConnect);
         if (pnode)
         {
@@ -2000,7 +2001,6 @@ void CConnman::ThreadMnbRequestConnections()
         
         
         LOCK(cs_vNodes);
-        //CNode *pnode = FindNode(p.first);
         CNode* pnode = FindNode((CService)CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)));
         if(!pnode || pnode->fDisconnect) continue;
 
