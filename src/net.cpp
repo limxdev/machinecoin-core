@@ -418,13 +418,12 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
             CNode* pnode = FindNode((CService)addrConnect);
             if (pnode)
             {
-                if(fConnectToMasternode && !pnode->fMasternode) {
+                /*if(fConnectToMasternode && !pnode->fMasternode) {
                     LogPrintf("Flagging node as masternode\n");
                     pnode->fMasternode = true;
-                }
+                }*/
                 pnode->MaybeSetAddrName(std::string(pszDest));
-                LogPrintf("Failed to open new connection, already connected\n");
-                return pnode;
+                return nullptr;
             }
         }
     }
@@ -1999,8 +1998,10 @@ void CConnman::ThreadMnbRequestConnections()
         //OpenNetworkConnection(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), false, &grant, nullptr, false, false, false, true, p.second);
         ConnectNode(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), nullptr, false, true);
         
-        
+        m_msgproc->InitializeNode(pnode);
         LOCK(cs_vNodes);
+        vNodes.push_back(pnode);
+        
         CNode* pnode = FindNode((CService)CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)));
         if(!pnode || pnode->fDisconnect) continue;
 
