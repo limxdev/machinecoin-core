@@ -381,6 +381,7 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
         if (IsLocal(addrConnect) && !fConnectToMasternode)
             return nullptr;
 
+        LOCK(cs_vNodes);
         // Look for an existing connection
         CNode* pnode = FindNode((CService)addrConnect);
         if (pnode)
@@ -482,7 +483,7 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
         pnode->fMasternode = true;
     }
     
-    //pnode->AddRef();
+    pnode->AddRef();
 
     return pnode;
 }
@@ -1171,7 +1172,7 @@ void CConnman::AcceptConnection(const ListenSocket& hListenSocket) {
     CAddress addr_bind = GetBindAddress(hSocket);
 
     CNode* pnode = new CNode(id, nLocalServices, GetBestHeight(), hSocket, addr, CalculateKeyedNetGroup(addr), nonce, addr_bind, "", true);
-
+    pnode->AddRef();
     pnode->fWhitelisted = whitelisted;
     m_msgproc->InitializeNode(pnode);
 
@@ -2833,9 +2834,6 @@ CNode::CNode(NodeId idIn, ServiceFlags nLocalServicesIn, int nMyStartingHeightIn
         mapRecvBytesPerMsgCmd[msg] = 0;
     mapRecvBytesPerMsgCmd[NET_MESSAGE_COMMAND_OTHER] = 0;
 
-    if(fInbound)
-        AddRef();
-        
     if (fLogIPs) {
         LogPrint(MCLog::NET, "Added connection to %s peer=%d\n", addrName, id);
     } else {
