@@ -382,7 +382,6 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
             return nullptr;
 
         // Look for an existing connection
-        LOCK(cs_vNodes);
         CNode* pnode = FindNode((CService)addrConnect);
         if (pnode)
         {
@@ -410,7 +409,21 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
                 LogPrint(MCLog::NET, "Resolver returned invalid address %s for %s", addrConnect.ToString(), pszDest);
                 return nullptr;
             }
-            // moved down
+            // It is possible that we already have a connection to the IP/port pszDest resolved to.
+            // In that case, drop the connection that was just created, and return the existing CNode instead.
+            // Also store the name we used to connect in that CNode, so that future FindNode() calls to that
+            // name catch this early.
+            LOCK(cs_vNodes);
+            CNode* pnode = FindNode((CService)addrConnect);
+            if (pnode)
+            {
+                if(fConnectToMasternode && !pnode->fMasternode) {
+                    LogPrintf("Flagging node as masternode\n");
+                    pnode->fMasternode = true;
+                }
+                pnode->MaybeSetAddrName(std::string(pszDest));
+                return pnode;
+            }
         }
     }
 
@@ -451,24 +464,6 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
         SplitHostPort(std::string(pszDest), port, host);
         connected = ConnectThroughProxy(proxy, host, port, hSocket, nConnectTimeout, nullptr);
     }
-    
-    // It is possible that we already have a connection to the IP/port pszDest resolved to.
-    // In that case, drop the connection that was just created, and return the existing CNode instead.
-    // Also store the name we used to connect in that CNode, so that future FindNode() calls to that
-    // name catch this early.
-    LOCK(cs_vNodes);
-    CNode* pnode = FindNode((CService)addrConnect);
-    if (pnode)
-    {
-        if(fConnectToMasternode && !pnode->fMasternode) {
-            LogPrintf("Flagging node as masternode\n");
-            pnode->fMasternode = true;
-        }
-        pnode->MaybeSetAddrName(std::string(pszDest));
-        CloseSocket(hSocket);
-        return pnode;
-    }
-    
     if (!connected) {
         CloseSocket(hSocket);
         return nullptr;
@@ -2000,13 +1995,13 @@ void CConnman::ThreadMnbRequestConnections()
         if(p.first == CService() || p.second.empty()) continue;
 
         //OpenNetworkConnection(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), false, &grant, nullptr, false, false, false, true, p.second);
-        CNode* pnode = ConnectNode(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), nullptr, false, true);
+        CNode* pnode = ConnectNode(CAddress(p.first, NODE_NETWORK), nullptr, false, true);
         
         m_msgproc->InitializeNode(pnode);
         LOCK(cs_vNodes);
         vNodes.push_back(pnode);
         
-        pnode = FindNode((CService)CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)));
+        pnode = FindNode((CService)CAddress(p.first, NODE_NETWORK));
         if(!pnode || pnode->fDisconnect) continue;
 
         const CNetMsgMaker msgMaker(pnode->GetSendVersion());
