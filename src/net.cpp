@@ -436,23 +436,6 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
             connected = ConnectSocketDirectly(addrConnect, hSocket, nConnectTimeout);
         }
         
-        // It is possible that we already have a connection to the IP/port pszDest resolved to.
-        // In that case, drop the connection that was just created, and return the existing CNode instead.
-        // Also store the name we used to connect in that CNode, so that future FindNode() calls to that
-        // name catch this early.
-        LOCK(cs_vNodes);
-        CNode* pnode = FindNode((CService)addrConnect);
-        if (pnode)
-        {
-            if(fConnectToMasternode && !pnode->fMasternode) {
-                LogPrintf("Flagging node as masternode\n");
-                pnode->fMasternode = true;
-            }
-            pnode->MaybeSetAddrName(std::string(pszDest));
-            CloseSocket(hSocket);
-            return pnode;
-        }
-        
         if (!proxyConnectionFailed) {
             // If a connection to the node was attempted, and failure (if any) is not caused by a problem connecting to
             // the proxy, mark this as an attempt.
@@ -468,6 +451,24 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
         SplitHostPort(std::string(pszDest), port, host);
         connected = ConnectThroughProxy(proxy, host, port, hSocket, nConnectTimeout, nullptr);
     }
+    
+    // It is possible that we already have a connection to the IP/port pszDest resolved to.
+    // In that case, drop the connection that was just created, and return the existing CNode instead.
+    // Also store the name we used to connect in that CNode, so that future FindNode() calls to that
+    // name catch this early.
+    LOCK(cs_vNodes);
+    CNode* pnode = FindNode((CService)addrConnect);
+    if (pnode)
+    {
+        if(fConnectToMasternode && !pnode->fMasternode) {
+            LogPrintf("Flagging node as masternode\n");
+            pnode->fMasternode = true;
+        }
+        pnode->MaybeSetAddrName(std::string(pszDest));
+        CloseSocket(hSocket);
+        return pnode;
+    }
+    
     if (!connected) {
         CloseSocket(hSocket);
         return nullptr;
