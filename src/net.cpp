@@ -410,21 +410,7 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
                 LogPrint(MCLog::NET, "Resolver returned invalid address %s for %s", addrConnect.ToString(), pszDest);
                 return nullptr;
             }
-            // It is possible that we already have a connection to the IP/port pszDest resolved to.
-            // In that case, drop the connection that was just created, and return the existing CNode instead.
-            // Also store the name we used to connect in that CNode, so that future FindNode() calls to that
-            // name catch this early.
-            LOCK(cs_vNodes);
-            CNode* pnode = FindNode((CService)addrConnect);
-            if (pnode)
-            {
-                /*if(fConnectToMasternode && !pnode->fMasternode) {
-                    LogPrintf("Flagging node as masternode\n");
-                    pnode->fMasternode = true;
-                }*/
-                pnode->MaybeSetAddrName(std::string(pszDest));
-                return nullptr;
-            }
+            // moved down
         }
     }
 
@@ -448,6 +434,23 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
                 return nullptr;
             }
             connected = ConnectSocketDirectly(addrConnect, hSocket, nConnectTimeout);
+        }
+        
+        // It is possible that we already have a connection to the IP/port pszDest resolved to.
+        // In that case, drop the connection that was just created, and return the existing CNode instead.
+        // Also store the name we used to connect in that CNode, so that future FindNode() calls to that
+        // name catch this early.
+        LOCK(cs_vNodes);
+        CNode* pnode = FindNode((CService)addrConnect);
+        if (pnode)
+        {
+            if(fConnectToMasternode && !pnode->fMasternode) {
+                LogPrintf("Flagging node as masternode\n");
+                pnode->fMasternode = true;
+            }
+            pnode->MaybeSetAddrName(std::string(pszDest));
+            CloseSocket(hSocket);
+            return pnode;
         }
         
         if (!proxyConnectionFailed) {
