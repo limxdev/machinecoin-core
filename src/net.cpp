@@ -484,6 +484,14 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
     }
     
     pnode->AddRef();
+    
+    if (fConnectToMasternode) {
+        m_msgproc->InitializeNode(pnode);
+        {
+            LOCK(cs_vNodes);
+            vNodes.push_back(pnode);
+        }
+    }
 
     return pnode;
 }
