@@ -1996,13 +1996,13 @@ void CConnman::ThreadMnbRequestConnections()
         if(p.first == CService() || p.second.empty()) continue;
 
         //OpenNetworkConnection(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), false, &grant, nullptr, false, false, false, true, p.second);
-        ConnectNode(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), nullptr, false, true);
+        CNode* pnode = ConnectNode(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), nullptr, false, true);
         
         m_msgproc->InitializeNode(pnode);
         LOCK(cs_vNodes);
         vNodes.push_back(pnode);
         
-        CNode* pnode = FindNode((CService)CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)));
+        pnode = FindNode((CService)CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)));
         if(!pnode || pnode->fDisconnect) continue;
 
         const CNetMsgMaker msgMaker(pnode->GetSendVersion());
