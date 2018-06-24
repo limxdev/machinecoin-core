@@ -945,7 +945,7 @@ void CMasternodeMan::DoFullVerificationStep(CConnman* connman)
         }
         LogPrint(MCLog::MN, "CMasternodeMan::DoFullVerificationStep -- Verifying masternode %s rank %d/%d address %s\n",
                     it->second.vin.prevout.ToStringShort(), it->first, nRanksTotal, it->second.addr.ToString());
-        if(SendVerifyRequest(CAddress(it->second.addr, NODE_NETWORK), vSortedByAddr, connman)) {
+        if(SendVerifyRequest(CAddress(it->second.addr, NODE_WITNESS), vSortedByAddr, connman)) {
             nCount++;
             if(nCount >= MAX_POSE_CONNECTIONS) break;
         }

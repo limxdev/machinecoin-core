@@ -484,14 +484,6 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
     }
     
     pnode->AddRef();
-    
-    if (fConnectToMasternode) {
-        m_msgproc->InitializeNode(pnode);
-        {
-            LOCK(cs_vNodes);
-            vNodes.push_back(pnode);
-        }
-    }
 
     return pnode;
 }
@@ -2006,13 +1998,9 @@ void CConnman::ThreadMnbRequestConnections()
         if(p.first == CService() || p.second.empty()) continue;
 
         //OpenNetworkConnection(CAddress(p.first, GetDesirableServiceFlags(NODE_NONE)), false, &grant, nullptr, false, false, false, true, p.second);
-        CNode* pnode = ConnectNode(CAddress(p.first, NODE_NETWORK), nullptr, false, true);
+        OpenNetworkConnection(CAddress(p.first, NODE_WITNESS), false, &grant, nullptr, false, false, true);
         
-        m_msgproc->InitializeNode(pnode);
-        LOCK(cs_vNodes);
-        vNodes.push_back(pnode);
-        
-        pnode = FindNode((CService)CAddress(p.first, NODE_NETWORK));
+        CNode* pnode = FindNode((CService)CAddress(p.first, NODE_WITNESS));
         if(!pnode || pnode->fDisconnect) continue;
 
         const CNetMsgMaker msgMaker(pnode->GetSendVersion());
@@ -2036,7 +2024,7 @@ void CConnman::ThreadMnbRequestConnections()
 }
 
 // if successful, this moves the passed grant to the constructed node
-void CConnman::OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound, const char *pszDest, bool fOneShot, bool fFeeler, bool manual_connection, bool fMasternode, std::set<uint256> second)
+void CConnman::OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound, const char *pszDest, bool fOneShot, bool fFeeler, bool manual_connection, bool fMasternode)
 {
     //
     // Initiate outbound network connection
