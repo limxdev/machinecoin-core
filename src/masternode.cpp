@@ -655,7 +655,7 @@ bool CMasternodeBroadcast::Sign(const CKey& keyCollateralAddress)
             return false;
         }
     } else {
-        std::string strMessage = addr.ToString(false) + boost::lexical_cast<std::string>(sigTime) +
+        std::string strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) +
                         pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() +
                         boost::lexical_cast<std::string>(nProtocolVersion);
 
@@ -694,7 +694,7 @@ bool CMasternodeBroadcast::CheckSignature(int& nDos) const
             }
         }
     } else {
-        std::string strMessage = addr.ToString(false) + boost::lexical_cast<std::string>(sigTime) +
+        std::string strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) +
                         pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() +
                         boost::lexical_cast<std::string>(nProtocolVersion);
 
