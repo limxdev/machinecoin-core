@@ -95,7 +95,7 @@ void CGovernanceManager::ProcessMessage(CNode* pfrom, const std::string& strComm
 
         if(pfrom->nVersion < MIN_GOVERNANCE_PEER_PROTO_VERSION) {
             LogPrint(MCLog::GOV, "MNGOVERNANCESYNC -- peer=%d using obsolete version %i\n", pfrom->id, pfrom->nVersion);
-            connman.PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
+            connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
                                strprintf("Version must be %d or greater", MIN_GOVERNANCE_PEER_PROTO_VERSION)));
             return;
         }
@@ -141,7 +141,7 @@ void CGovernanceManager::ProcessMessage(CNode* pfrom, const std::string& strComm
 
         if(pfrom->nVersion < MIN_GOVERNANCE_PEER_PROTO_VERSION) {
             LogPrint(MCLog::GOV, "MNGOVERNANCEOBJECT -- peer=%d using obsolete version %i\n", pfrom->id, pfrom->nVersion);
-            connman.PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
+            connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
                                strprintf("Version must be %d or greater", MIN_GOVERNANCE_PEER_PROTO_VERSION)));
             return;
         }
@@ -231,7 +231,7 @@ void CGovernanceManager::ProcessMessage(CNode* pfrom, const std::string& strComm
         
         if(pfrom->nVersion < MIN_GOVERNANCE_PEER_PROTO_VERSION) {
             LogPrint(MCLog::GOV, "MNGOVERNANCEOBJECTVOTE -- peer=%d using obsolete version %i\n", pfrom->id, pfrom->nVersion);
-            connman.PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
+            connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
                                strprintf("Version must be %d or greater", MIN_GOVERNANCE_PEER_PROTO_VERSION)));
         }
 
@@ -685,8 +685,8 @@ void CGovernanceManager::SyncSingleObjAndItsVotes(CNode* pnode, const uint256& n
     }
     
     CNetMsgMaker msgMaker(pnode->GetSendVersion());
-    connman.PushMessage(pnode, msgMaker.Make(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_GOVOBJ, 1));
-    connman.PushMessage(pnode, msgMaker.Make(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_GOVOBJ_VOTE, nVoteCount));
+    connman->PushMessage(pnode, msgMaker.Make(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_GOVOBJ, 1));
+    connman->PushMessage(pnode, msgMaker.Make(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_GOVOBJ_VOTE, nVoteCount));
     LogPrintf("CGovernanceManager::%s -- sent 1 object and %d votes to peer=%d\n", __func__, nVoteCount, pnode->GetId());
 }
 
