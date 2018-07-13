@@ -367,7 +367,7 @@ static CAddress GetBindAddress(SOCKET sock)
     return addr_bind;
 }
 
-CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCountFailure, bool fConnectToMasternode)
+CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCountFailure)
 {
     // TODO: This is different from what we have in Bitcoin which only calls ConnectNode from OpenNetworkConnection
     //       If we ever switch to using OpenNetworkConnection for MNs as well, this can be removed
@@ -1969,7 +1969,7 @@ void CConnman::ThreadOpenAddedConnections()
 void CConnman::ThreadOpenMasternodeConnections()
 {
     // Connecting to specific addresses, no masternode connections available
-    if (IsArgSet("-connect") && mapMultiArgs.at("-connect").size() > 0)
+    if (gArgs.IsArgSet("-connect") && gArgs.mapMultiArgs.at("-connect").size() > 0)
         return;
 
     while (!interruptNet)
@@ -2030,13 +2030,7 @@ void CConnman::OpenNetworkConnection(const CAddress& addrConnect, bool fCountFai
     } else if (FindNode(std::string(pszDest)))
         return;
 
-    CNode* pnode = nullptr;
-
-    if (fMasternode == true) {
-        pnode = ConnectNode(addrConnect, pszDest, fCountFailure, true);
-    }
-    else
-        pnode = ConnectNode(addrConnect, pszDest, fCountFailure, false);
+    CNode* pnode = ConnectNode(addrConnect, pszDest, fCountFailure);
 
     if (!pnode)
         return;

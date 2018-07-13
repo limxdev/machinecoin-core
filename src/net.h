@@ -188,7 +188,7 @@ public:
     // and/or you want it to be disconnected on CMasternodeMan::ProcessMasternodeConnections()
     // Unfortunately, can't make this method private like in Machinecoin,
     // because it's used in many Machinecoin-specific places (masternode).
-    CNode* ConnectNode(CAddress addrConnect, const char *pszDest = NULL, bool fCountFailure = false, bool fConnectToMasternode = false);
+    CNode* ConnectNode(CAddress addrConnect, const char *pszDest = NULL, bool fCountFailure = false);
 
     struct CFullyConnectedOnly {
         bool operator() (const CNode* pnode) const {
