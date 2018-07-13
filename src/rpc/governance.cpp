@@ -193,8 +193,6 @@ UniValue gobject(const JSONRPCRequest& request)
         if(!govobj.IsValidLocally(strError, false))
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Governance object is not valid - " + govobj.GetHash().ToString() + " - " + strError);
 
-        EnsureWalletIsUnlocked();
-
         CWalletTx wtx;        
         CWalletRef gotWallet = nullptr;
         for (CWalletRef pwallet : vpwallets) {

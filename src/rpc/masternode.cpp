@@ -437,7 +437,6 @@ UniValue masternodelist(const JSONRPCRequest& request)
     if (strMode == "rank") {
         CMasternodeMan::rank_pair_vec_t vMasternodeRanks;
         mnodeman.GetMasternodeRanks(vMasternodeRanks);
-        typedef std::pair<int, CMasternode> PairType;
         for (const auto& rankpair : vMasternodeRanks) {
             std::string strOutpoint = rankpair.second.outpoint.ToStringShort();
             if (strFilter !="" && strOutpoint.find(strFilter) == std::string::npos) continue;
