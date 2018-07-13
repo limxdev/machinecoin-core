@@ -83,8 +83,8 @@ private:
 
     bool GetMasternodeScores(const uint256& nBlockHash, score_pair_vec_t& vecMasternodeScoresRet, int nMinProtocol = 0);
     
-    void SyncSingle(CNode* pnode, const COutPoint& outpoint, CConnman& connman);
-    void SyncAll(CNode* pnode, CConnman& connman);
+    void SyncSingle(CNode* pnode, const COutPoint& outpoint, CConnman* connman);
+    void SyncAll(CNode* pnode, CConnman* connman);
 
     void PushDsegInvs(CNode* pnode, const CMasternode& mn);
 
@@ -182,14 +182,14 @@ public:
 
     void ProcessMasternodeConnections(CConnman* connman);
     std::pair<CService, std::set<uint256> > PopScheduledMnbRequestConnection();
-    void ProcessPendingMnbRequests(CConnman& connman);
+    void ProcessPendingMnbRequests(CConnman* connman);
 
     void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman);
 
     void DoFullVerificationStep(CConnman* connman);
     void CheckSameAddr();
-    bool SendVerifyRequest(const CAddress& addr, const std::vector<const CMasternode*>& vSortedByAddr, CConnman& connman);
-    void ProcessPendingMnvRequests(CConnman& connman);
+    bool SendVerifyRequest(const CAddress& addr, const std::vector<const CMasternode*>& vSortedByAddr, CConnman* connman);
+    void ProcessPendingMnvRequests(CConnman* connman);
     void SendVerifyReply(CNode* pnode, CMasternodeVerification& mnv, CConnman* connman);
     void ProcessVerifyReply(CNode* pnode, CMasternodeVerification& mnv);
     void ProcessVerifyBroadcast(CNode* pnode, const CMasternodeVerification& mnv);

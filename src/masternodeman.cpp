@@ -684,7 +684,7 @@ bool CMasternodeMan::GetMasternodeRanks(CMasternodeMan::rank_pair_vec_t& vecMast
     return true;
 }
 
-void CMasternodeMan::ProcessPendingMnbRequests(CConnman& connman)
+void CMasternodeMan::ProcessPendingMnbRequests(CConnman* connman)
 {
     std::pair<CService, std::set<uint256> > p = PopScheduledMnbRequestConnection();
     if (!(p.first == CService() || p.second.empty())) {
@@ -895,7 +895,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
     }
 }
                      
-void CMasternodeMan::SyncSingle(CNode* pnode, const COutPoint& outpoint, CConnman& connman)
+void CMasternodeMan::SyncSingle(CNode* pnode, const COutPoint& outpoint, CConnman* connman)
 {
     // do not provide any data until our node is synced
     if (!masternodeSync.IsSynced()) return;
@@ -909,11 +909,11 @@ void CMasternodeMan::SyncSingle(CNode* pnode, const COutPoint& outpoint, CConnma
         // NOTE: send masternode regardless of its current state, the other node will need it to verify old votes.
         LogPrint(MCLog::MN, "CMasternodeMan::%s -- Sending Masternode entry: masternode=%s  addr=%s\n", __func__, outpoint.ToStringShort(), it->second.addr.ToString());
         PushDsegInvs(pnode, it->second);
-        LogPrintf("CMasternodeMan::%s -- Sent 1 Masternode inv to peer=%d\n", __func__, pnode->id);
+        LogPrintf("CMasternodeMan::%s -- Sent 1 Masternode inv to peer=%d\n", __func__, pnode->GetId());
     }
 }
 
-void CMasternodeMan::SyncAll(CNode* pnode, CConnman& connman)
+void CMasternodeMan::SyncAll(CNode* pnode, CConnman* connman)
 {
     // do not provide any data until our node is synced
     if (!masternodeSync.IsSynced()) return;
@@ -928,7 +928,7 @@ void CMasternodeMan::SyncAll(CNode* pnode, CConnman& connman)
         auto it = mAskedUsForMasternodeList.find(addrSquashed);
         if (it != mAskedUsForMasternodeList.end() && it->second > GetTime()) {
             Misbehaving(pnode->GetId(), 34);
-            LogPrintf("CMasternodeMan::%s -- peer already asked me for the list, peer=%d\n", __func__, pnode->id);
+            LogPrintf("CMasternodeMan::%s -- peer already asked me for the list, peer=%d\n", __func__, pnode->GetId());
             return;
         }
         int64_t askAgain = GetTime() + DSEG_UPDATE_SECONDS;
@@ -1099,7 +1099,7 @@ void CMasternodeMan::CheckSameAddr()
     }
 }
 
-bool CMasternodeMan::SendVerifyRequest(const CAddress& addr, const std::vector<const CMasternode*>& vSortedByAddr, CConnman& connman)
+bool CMasternodeMan::SendVerifyRequest(const CAddress& addr, const std::vector<const CMasternode*>& vSortedByAddr, CConnman* connman)
 {
     if(netfulfilledman.HasFulfilledRequest(addr, strprintf("%s", NetMsgType::MNVERIFY)+"-request")) {
         // we already asked for verification, not a good idea to do this too often, skip it
@@ -1119,7 +1119,7 @@ bool CMasternodeMan::SendVerifyRequest(const CAddress& addr, const std::vector<c
     return true;
 }
                          
-void CMasternodeMan::ProcessPendingMnvRequests(CConnman& connman)
+void CMasternodeMan::ProcessPendingMnvRequests(CConnman* connman)
 {
     LOCK(cs_mapPendingMNV);
 
@@ -1329,7 +1329,7 @@ void CMasternodeMan::ProcessVerifyBroadcast(CNode* pnode, const CMasternodeVerif
 
     if(mnv.masternodeOutpoint1 == mnv.masternodeOutpoint2) {
         LogPrint(MCLog::MN, "CMasternodeMan::ProcessVerifyBroadcast -- ERROR: same outpoints %s, peer=%d\n",
-                    mnv.masternodeOutpoint1.ToStringShort(), pnode->id);
+                    mnv.masternodeOutpoint1.ToStringShort(), pnode->GetId());
         // that was NOT a good idea to cheat and verify itself,
         // ban the node we received such message from
         Misbehaving(pnode->GetId(), 100);
@@ -1353,7 +1353,7 @@ void CMasternodeMan::ProcessVerifyBroadcast(CNode* pnode, const CMasternodeVerif
 
     if(nRank > MAX_POSE_RANK) {
         LogPrint(MCLog::MN, "CMasternodeMan::ProcessVerifyBroadcast -- Masternode %s is not in top %d, current rank %d, peer=%d\n",
-                    mnv.masternodeOutpoint2.ToStringShort(), (int)MAX_POSE_RANK, nRank, pnode->id);
+                    mnv.masternodeOutpoint2.ToStringShort(), (int)MAX_POSE_RANK, nRank, pnode->GetId());
         return;
     }
 

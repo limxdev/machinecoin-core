@@ -600,7 +600,7 @@ void CMasternodePayments::CheckAndRemove()
     LogPrint(MCLog::MN, "CMasternodePayments::CheckAndRemove -- %s\n", ToString());
 }
 
-bool CMasternodePaymentVote::IsValid(CNode* pnode, int nValidationHeight, std::string& strError, CConnman& connman) const
+bool CMasternodePaymentVote::IsValid(CNode* pnode, int nValidationHeight, std::string& strError, CConnman* connman) const
 {
     masternode_info_t mnInfo;
 
@@ -786,7 +786,7 @@ void CMasternodePayments::CheckBlockVotes(int nBlockHeight)
     LogPrint(MCLog::MN, "%s", debugStr);
 }
 
-void CMasternodePaymentVote::Relay(CConnman& connman) const
+void CMasternodePaymentVote::Relay(CConnman* connman) const
 {
     // Do not relay until fully synced
     if(!masternodeSync.IsSynced()) {
@@ -838,7 +838,7 @@ std::string CMasternodePaymentVote::ToString() const
 }
 
 // Send only votes for future blocks, node should request every other missing payment block individually
-void CMasternodePayments::Sync(CNode* pnode, CConnman& connman) const
+void CMasternodePayments::Sync(CNode* pnode, CConnman* connman) const
 {
     const CNetMsgMaker msgMaker(pnode->GetSendVersion());
 
@@ -868,7 +868,7 @@ void CMasternodePayments::Sync(CNode* pnode, CConnman& connman) const
 }
 
 // Request low data/unknown payment blocks in batches directly from some node instead of/after preliminary Sync.
-void CMasternodePayments::RequestLowDataPaymentBlocks(CNode* pnode, CConnman& connman) const
+void CMasternodePayments::RequestLowDataPaymentBlocks(CNode* pnode, CConnman* connman) const
 {
     if(!masternodeSync.IsMasternodeListSynced()) return;
     

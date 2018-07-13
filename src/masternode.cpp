@@ -695,7 +695,7 @@ bool CMasternodeBroadcast::CheckSignature(int& nDos) const
     return true;
 }
 
-void CMasternodeBroadcast::Relay(CConnman& connman) const
+void CMasternodeBroadcast::Relay(CConnman* connman) const
 {
     // Do not relay until fully synced
     if(!masternodeSync.IsSynced()) {

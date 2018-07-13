@@ -161,8 +161,8 @@ public:
     bool Sign();
     bool CheckSignature(const CPubKey& pubKeyMasternode, int nValidationHeight, int &nDos) const;
 
-    bool IsValid(CNode* pnode, int nValidationHeight, std::string& strError, CConnman& connman) const;
-    void Relay(CConnman& connman) const;
+    bool IsValid(CNode* pnode, int nValidationHeight, std::string& strError, CConnman* connman) const;
+    void Relay(CConnman* connman) const;
 
     bool IsVerified() const { return !vchSig.empty(); }
     void MarkAsNotVerified() { vchSig.clear(); }
@@ -209,8 +209,8 @@ public:
     bool ProcessBlock(int nBlockHeight, CConnman* connman);
     void CheckBlockVotes(int nBlockHeight);
 
-    void Sync(CNode* node, CConnman& connman) const;
-    void RequestLowDataPaymentBlocks(CNode* pnode, CConnman& connman) const;
+    void Sync(CNode* node, CConnman* connman) const;
+    void RequestLowDataPaymentBlocks(CNode* pnode, CConnman* connman) const;
     void CheckAndRemove();
 
     bool GetBlockPayee(int nBlockHeight, CScript& payeeRet) const;

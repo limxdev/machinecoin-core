@@ -403,7 +403,7 @@ public:
 
     bool Sign(const CKey& keyCollateralAddress);
     bool CheckSignature(int& nDos) const;
-    void Relay(CConnman& connman) const;
+    void Relay(CConnman* connman) const;
 };
 
 class CMasternodeVerification
