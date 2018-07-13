@@ -540,7 +540,6 @@ bool CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight, bool f
     int nCountTenth = 0;
     arith_uint256 nHighest = 0;
     const CMasternode *pBestMasternode = NULL;
-    typedef std::pair<int, CMasternode*> PairType;
     for (const auto& s : vecMasternodeLastPaid) {
         arith_uint256 nScore = s.second->CalculateScore(blockHash);
         if(nScore > nHighest){
