@@ -97,8 +97,8 @@ UniValue masternode(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INTERNAL_ERROR, strprintf("Incorrect masternode address %s", strAddress));
 
         // TODO: Pass CConnman instance somehow and don't use global variable.
-        CNode *pnode = g_connman->ConnectNode(CAddress(addr, NODE_NETWORK), NULL);
-        if(!pnode)
+        g_connman->OpenMasternodeConnection(CAddress(addr, NODE_NETWORK));
+        if (!g_connman->IsConnected(CAddress(addr, NODE_NETWORK), CConnman::AllNodes))
             throw JSONRPCError(RPC_INTERNAL_ERROR, strprintf("Couldn't connect to masternode %s", strAddress));
 
         return "successfully connected";
@@ -185,7 +185,7 @@ UniValue masternode(const JSONRPCRequest& request)
                 bool fResult = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb);
                 
                 int nDoS;
-                if (fResult && !mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDoS, g_connman)) {
+                if (fResult && !mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDoS, g_connman.release())) {
                     strError = "Failed to verify MNB";
                     fResult = false;
                 }
@@ -241,7 +241,7 @@ UniValue masternode(const JSONRPCRequest& request)
             bool fResult = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb);
 
             int nDoS;
-            if (fResult && !mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDoS, g_connman)) {
+            if (fResult && !mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDoS, g_connman.release())) {
                 strError = "Failed to verify MNB";
                 fResult = false;
             }
@@ -786,7 +786,7 @@ UniValue masternodebroadcast(const JSONRPCRequest& request)
             int nDos = 0;
             bool fResult;
             if (mnb.CheckSignature(nDos)) {
-                fResult = mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDos, g_connman);
+                fResult = mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDos, g_connman.release());
                 mnodeman.NotifyMasternodeUpdates(&connman);
             } else fResult = false;
 
