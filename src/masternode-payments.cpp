@@ -728,7 +728,6 @@ void CMasternodePayments::CheckBlockVotes(int nBlockHeight)
 
     int i{0};
     for (const auto& mn : mns) {
-        auto mn = mns[i];
         CScript payee;
         bool found = false;
 
