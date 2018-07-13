@@ -248,7 +248,7 @@ bool CSuperblockManager::IsSuperblockTriggered(int nBlockHeight)
             continue;
         }
 
-        LogPrint(MCLog::GOV, "CSuperblockManager::IsSuperblockTriggered -- data = %s\n", pObj->GetDataAsString());
+        LogPrint(MCLog::GOV, "CSuperblockManager::IsSuperblockTriggered -- data = %s\n", pObj->GetDataAsPlainString());
 
         // note : 12.1 - is epoch calculation correct?
 
