@@ -117,7 +117,7 @@ void MasternodeList::StartAlias(std::string strAlias)
             bool fSuccess = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb);
 
             int nDoS;
-            if (fSuccess && !mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDoS, *g_connman)) {
+            if (fSuccess && !mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDoS, g_connman.release())) {
                 strError = "Failed to verify MNB";
                 fSuccess = false;
             }
@@ -164,7 +164,7 @@ void MasternodeList::StartAll(std::string strCommand)
         bool fSuccess = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb);
 
         int nDoS;
-        if (fSuccess && !mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDoS, *g_connman)) {
+        if (fSuccess && !mnodeman.CheckMnbAndUpdateMasternodeList(NULL, mnb, nDoS, g_connman.release())) {
             strError = "Failed to verify MNB";
             fSuccess = false;
         }
