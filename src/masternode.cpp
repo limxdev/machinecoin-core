@@ -141,10 +141,10 @@ void CMasternode::Check(bool fForce)
 
     int nHeight = 0;
     if(!fUnitTest) {
-        CollateralStatus err = CheckCollateral(outpoint);
-        if (err == COLLATERAL_UTXO_NOT_FOUND) {
+        Coin coin;
+        if(!GetUTXOCoin(outpoint, coin)) {
             nActiveState = MASTERNODE_OUTPOINT_SPENT;
-            LogPrint(MCLog::MN, "CMasternode::Check -- Failed to find Masternode UTXO, masternode=%s\n", outpoint.ToStringShort());
+            LogPrint("masternode", "CMasternode::Check -- Failed to find Masternode UTXO, masternode=%s\n", outpoint.ToStringShort());
             return;
         }
 
@@ -262,24 +262,6 @@ void CMasternode::Check(bool fForce)
     }
 }
 
-bool CMasternode::IsInputAssociatedWithPubkey()
-{
-    CScript payee;
-    payee = GetScriptForDestination(WitnessV0KeyHash(pubKeyCollateralAddress.GetID()));
-
-    CTransactionRef tx;
-    uint256 hash;
-    if(GetTransaction(vin.prevout.hash, tx, Params().GetConsensus(), hash, true)) {
-        for (CTxOut out : tx->vout) {
-            CTxDestination dest;
-            ExtractDestination(out.scriptPubKey, dest);
-            if(out.nValue == 25000*COIN && EncodeDestination(payee) == EncodeDestination(dest)) return true;
-        }
-    }
-
-    return false;
-}
-
 bool CMasternode::IsValidNetAddr()
 {
     return IsValidNetAddr(addr);
@@ -361,7 +343,6 @@ void CMasternode::UpdateLastPaid(const CBlockIndex *pindex, int nMaxBlocksToScan
                         LogPrint(MCLog::MN, "CMasternode::UpdateLastPaidBlock -- searching for block with payment to %s -- found new %d\n", vin.prevout.ToStringShort(), nBlockLastPaid);
                         return;
                     }
-                }
             }
             else {
                 return;

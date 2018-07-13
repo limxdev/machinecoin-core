@@ -179,7 +179,8 @@ public:
     enum CollateralStatus {
         COLLATERAL_OK,
         COLLATERAL_UTXO_NOT_FOUND,
-        COLLATERAL_INVALID_AMOUNT
+        COLLATERAL_INVALID_AMOUNT,
+        COLLATERAL_INVALID_PUBKEY
     };
 
 
@@ -290,9 +291,6 @@ public:
 
         return false;
     }
-
-    /// Is the input associated with collateral public key? (and there is 25000 MAC - checking if valid masternode)
-    bool IsInputAssociatedWithPubkey();
 
     bool IsValidNetAddr();
     static bool IsValidNetAddr(CService addrIn);

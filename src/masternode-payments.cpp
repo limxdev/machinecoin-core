@@ -366,11 +366,6 @@ uint256 CMasternodePaymentVote::GetSignatureHash() const
 bool CMasternodePaymentVote::Sign()
 {
     std::string strError;
-
-    if(!CMessageSigner::VerifyMessage(activeMasternode.pubKeyMasternode, vchSig, strMessage, strError)) {
-        LogPrint(MCLog::MN, "CMasternodePaymentVote::Sign -- VerifyMessage() failed, error: %s\n", strError);
-        return false;
-    }
     
     uint256 hash = GetSignatureHash();
     
@@ -495,7 +490,7 @@ bool CMasternodeBlockPayees::HasPayeeWithVotes(const CScript& payeeIn, int nVote
     return false;
 }
 
-bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew, CAmount blockReward) const
+bool CMasternodeBlockPayees::IsTransactionValid(const CTransactionRef& txNew, CAmount blockReward) const
 {
     LOCK(cs_vecPayees);
 
@@ -552,7 +547,7 @@ std::string CMasternodeBlockPayees::GetRequiredPaymentsString() const
         if (!strRequiredPayments.empty())
             strRequiredPayments += ", ";
 
-        strRequiredPayments += strprintf("%s:%d", address2.ToString(), payee.GetVoteCount());
+        strRequiredPayments += strprintf("%s:%d", EncodeDestination(address), payee.GetVoteCount());
     }
     
     if (strRequiredPayments.empty())
@@ -569,12 +564,12 @@ std::string CMasternodePayments::GetRequiredPaymentsString(int nBlockHeight) con
     return it == mapMasternodeBlocks.end() ? "Unknown" : it->second.GetRequiredPaymentsString();
 }
 
-bool CMasternodePayments::IsTransactionValid(const CTransaction& txNew, int nBlockHeight, CAmount blockReward) const
+bool CMasternodePayments::IsTransactionValid(const CTransactionRef& txNew, int nBlockHeight, CAmount blockReward) const
 {
     LOCK(cs_mapMasternodeBlocks);
 
     const auto it = mapMasternodeBlocks.find(nBlockHeight);
-    return it == mapMasternodeBlocks.end() ? true : it->second.IsTransactionValid(txNew, blockReward);
+    return it == mapMasternodeBlocks.end() ? true : it->second.IsTransactionValid(txNew, nBlockHeight, blockReward);
 }
 
 void CMasternodePayments::CheckAndRemove()
@@ -760,10 +755,9 @@ void CMasternodePayments::CheckBlockVotes(int nBlockHeight)
         if (found) {
             CTxDestination address1;
             ExtractDestination(payee, address1);
-            CBitcoinAddress address2(address1);
 
             debugStr += strprintf("    - %s - voted for %s\n",
-                                  mn.second.outpoint.ToStringShort(), address2.ToString());
+                                  mn.second.outpoint.ToStringShort(), EncodeDestination(address1));
         } else {
             mapMasternodesDidNotVote.emplace(mn.second.outpoint, 0).first->second++;
 
