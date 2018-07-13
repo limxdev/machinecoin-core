@@ -81,7 +81,7 @@ public:
     }
 
     size_type GetSize() const {
-        return return listItems.size();
+        return listItems.size();
     }
 
     bool Insert(const K& key, const V& value)
@@ -173,7 +173,6 @@ public:
         }
 
         listItems.erase(it->second);
-        --nCurrentSize;
         mapIt.erase(it);
 
         if(mapIt.empty()) {

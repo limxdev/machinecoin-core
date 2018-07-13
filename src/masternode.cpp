@@ -97,13 +97,13 @@ arith_uint256 CMasternode::CalculateScore(const uint256& blockHash) const
     return UintToArith256(ss.GetHash());
 }
 
-CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outpoint)
+CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outpoint, const CPubKey& pubkey)
 {
     int nHeight;
-    return CheckCollateral(outpoint, nHeight);
+    return CheckCollateral(outpoint, pubkey, nHeight);
 }
 
-CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outpoint, int& nHeightRet)
+CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outpoint, const CPubKey& pubkey, int& nHeightRet)
 {
     AssertLockHeld(cs_main);
 
@@ -114,6 +114,10 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
 
     if(coin.out.nValue != 25000 * COIN) {
         return COLLATERAL_INVALID_AMOUNT;
+    }
+
+    if(pubkey == CPubKey() || coin.out.scriptPubKey != GetScriptForDestination(pubkey.GetID())) {
+        return COLLATERAL_INVALID_PUBKEY;
     }
 
     nHeightRet = coin.nHeight;

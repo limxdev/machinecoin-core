@@ -307,23 +307,6 @@ bool CGovernanceObject::CheckSignature(const CPubKey& pubKeyMasternode) const
     return true;
 }
 
-uint256 CGovernanceObject::GetHash() const
-{
-    // CREATE HASH OF ALL IMPORTANT PIECES OF DATA
-
-    CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
-    ss << nHashParent;
-    ss << nRevision;
-    ss << nTime;
-    ss << strData;
-    ss << vinMasternode;
-    ss << vchSig;
-    // fee_tx is left out on purpose
-    uint256 h1 = ss.GetHash();
-
-    return h1;
-}
-
 /**
    Return the actual object from the vchData JSON structure.
 
