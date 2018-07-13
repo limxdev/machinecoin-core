@@ -24,8 +24,6 @@
 
 #include <algorithm>
 
-bool EnsureWalletIsAvailable(bool avoidException);
-
 UniValue masternode(const JSONRPCRequest& request)
 {
     CConnman& connman = *g_connman;
@@ -158,9 +156,6 @@ UniValue masternode(const JSONRPCRequest& request)
 #ifdef ENABLE_WALLET
     if (strCommand == "start-alias")
     {
-        if (!EnsureWalletIsAvailable(request.fHelp))
-            return NullUniValue;
-
         if (request.params.size() < 2)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Please specify an alias");
 
@@ -210,9 +205,6 @@ UniValue masternode(const JSONRPCRequest& request)
 
     if (strCommand == "start-all" || strCommand == "start-missing" || strCommand == "start-disabled")
     {
-        if (!EnsureWalletIsAvailable(request.fHelp))
-            return NullUniValue;
-
         for (CWalletRef pwallet : vpwallets) {
             EnsureWalletIsUnlocked(pwallet);
             LOCK(pwallet->cs_wallet);
@@ -303,8 +295,6 @@ UniValue masternode(const JSONRPCRequest& request)
 
 #ifdef ENABLE_WALLET
     if (strCommand == "outputs") {
-        if (!EnsureWalletIsAvailable(request.fHelp))
-            return NullUniValue;
         // Find possible candidates
         std::vector<COutput> vPossibleCoins;
         
@@ -605,9 +595,6 @@ UniValue masternodebroadcast(const JSONRPCRequest& request)
 #ifdef ENABLE_WALLET
     if (strCommand == "create-alias")
     {
-        if (!EnsureWalletIsAvailable(request.fHelp))
-            return NullUniValue;
-
         // wait for reindex and/or import to finish
         if (fImporting || fReindex)
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Wait for reindex and/or import to finish");
@@ -660,9 +647,6 @@ UniValue masternodebroadcast(const JSONRPCRequest& request)
 
     if (strCommand == "create-all")
     {
-        if (!EnsureWalletIsAvailable(request.fHelp))
-            return NullUniValue;
-
         // wait for reindex and/or import to finish
         if (fImporting || fReindex)
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Wait for reindex and/or import to finish");
