@@ -908,6 +908,9 @@ void PeerLogicValidation::InitializeCurrentBlockTip() {
 
     if (fInitialDownload)
         return;
+    
+    if (fLiteMode)
+        return;
 
     mnodeman.UpdatedBlockTip(pindexNew, false);
     mnpayments.UpdatedBlockTip(pindexNew, connman);
@@ -946,7 +949,7 @@ void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CB
   
     masternodeSync.UpdatedBlockTip(pindexNew, fInitialDownload, connman);
 
-    if (!fInitialDownload) {
+    if (!fInitialDownload && !fLiteMode) {
         mnodeman.UpdatedBlockTip(pindexNew);
         mnpayments.UpdatedBlockTip(pindexNew, connman);
         governance.UpdatedBlockTip(pindexNew, connman);
@@ -1336,7 +1339,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
             }
 
             if (!push && inv.type == MSG_GOVERNANCE_OBJECT) {
-                CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
+                CDataStream ss(SER_NETWORK, pfrom->GetSendVersion());
                 bool topush = false;
                 {
                     if(governance.HaveObjectForHash(inv.hash)) {
@@ -1353,7 +1356,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
             }
 
             if (!push && inv.type == MSG_GOVERNANCE_OBJECT_VOTE) {
-                CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
+                CDataStream ss(SER_NETWORK, pfrom->GetSendVersion());
                 bool topush = false;
                 {
                     if(governance.HaveVoteForHash(inv.hash)) {

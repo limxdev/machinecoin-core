@@ -180,7 +180,7 @@ public:
     void Interrupt();
     bool GetNetworkActive() const { return fNetworkActive; };
     void SetNetworkActive(bool active);
-    void OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound = nullptr, const char *strDest = nullptr, bool fOneShot = false, bool fFeeler = false, bool manual_connection = false, bool fMasternode = false);
+    void OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound = nullptr, const char *strDest = nullptr, bool fOneShot = false, bool fFeeler = false, bool manual_connection = false, bool fConnectToMasternode = false);
     bool CheckIncomingNonce(uint64_t nonce);
     
     // fConnectToMasternode should be 'true' only if you want this node to allow to connect to itself
@@ -270,6 +270,7 @@ public:
     };
     
     // Masternodes
+    std::vector<CNode*> CopyNodeVector(std::function<bool(const CNode* pnode)> cond);
     std::vector<CNode*> CopyNodeVector();
     void ReleaseNodeVector(const std::vector<CNode*>& vecNodes);
     void RelayInv(CInv &inv, const int minProtoVersion = MIN_PEER_PROTO_VERSION);
@@ -320,6 +321,7 @@ public:
 
     bool AddNode(const std::string& node);
     bool RemoveAddedNode(const std::string& node);
+    bool AddPendingMasternode(const CService& addr);
     std::vector<AddedNodeInfo> GetAddedNodeInfo();
 
     size_t GetNodeCount(NumConnections num);
@@ -416,7 +418,7 @@ private:
     void AddOneShot(const std::string& strDest);
     void ProcessOneShot();
     void ThreadOpenConnections(std::vector<std::string> connect);
-    void ThreadMnbRequestConnections();
+    void ThreadOpenMasternodeConnections();
     void ThreadMessageHandler();
     void AcceptConnection(const ListenSocket& hListenSocket);
     void ThreadSocketHandler();
@@ -484,6 +486,8 @@ private:
     CCriticalSection cs_vOneShots;
     std::vector<std::string> vAddedNodes GUARDED_BY(cs_vAddedNodes);
     CCriticalSection cs_vAddedNodes;
+    std::vector<CService> vPendingMasternodes;
+    CCriticalSection cs_vPendingMasternodes;
     std::vector<CNode*> vNodes;
     std::list<CNode*> vNodesDisconnected;
     mutable CCriticalSection cs_vNodes;
@@ -520,7 +524,7 @@ private:
     std::thread threadSocketHandler;
     std::thread threadOpenAddedConnections;
     std::thread threadOpenConnections;
-    std::thread threadMnbRequestConnections;
+    std::thread threadOpenMasternodeConnections;
     std::thread threadMessageHandler;
 
     /** flag for deciding to connect to an extra outbound peer,
