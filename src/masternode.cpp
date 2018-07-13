@@ -144,7 +144,7 @@ void CMasternode::Check(bool fForce)
         Coin coin;
         if(!GetUTXOCoin(outpoint, coin)) {
             nActiveState = MASTERNODE_OUTPOINT_SPENT;
-            LogPrint("masternode", "CMasternode::Check -- Failed to find Masternode UTXO, masternode=%s\n", outpoint.ToStringShort());
+            LogPrint(MCLog::MN, "CMasternode::Check -- Failed to find Masternode UTXO, masternode=%s\n", outpoint.ToStringShort());
             return;
         }
 
@@ -340,7 +340,7 @@ void CMasternode::UpdateLastPaid(const CBlockIndex *pindex, int nMaxBlocksToScan
                     if(mnpayee == txout.scriptPubKey && nMasternodePayment == txout.nValue) {
                         nBlockLastPaid = pindexActive->nHeight;
                         nTimeLastPaid = pindexActive->nTime;
-                        LogPrint(MCLog::MN, "CMasternode::UpdateLastPaidBlock -- searching for block with payment to %s -- found new %d\n", vin.prevout.ToStringShort(), nBlockLastPaid);
+                        LogPrint(MCLog::MN, "CMasternode::UpdateLastPaidBlock -- searching for block with payment to %s -- found new %d\n", outpoint.ToStringShort(), nBlockLastPaid);
                         return;
                     }
             }
@@ -355,7 +355,7 @@ void CMasternode::UpdateLastPaid(const CBlockIndex *pindex, int nMaxBlocksToScan
 
     // Last payment for this masternode wasn't found in latest mnpayments blocks
     // or it was found in mnpayments blocks but wasn't found in the blockchain.
-    LogPrint(MCLog::MN, "CMasternode::UpdateLastPaidBlock -- searching for block with payment to %s -- keeping old %d\n", vin.prevout.ToStringShort(), nBlockLastPaid);
+    LogPrint(MCLog::MN, "CMasternode::UpdateLastPaidBlock -- searching for block with payment to %s -- keeping old %d\n", outpoint.ToStringShort(), nBlockLastPaid);
 }
 
 #ifdef ENABLE_WALLET
@@ -469,7 +469,7 @@ bool CMasternodeBroadcast::SimpleCheck(int& nDos)
 
     if(nProtocolVersion < mnpayments.GetMinMasternodePaymentsProto()) {
         LogPrintf("CMasternodeBroadcast::SimpleCheck -- outdated Masternode: masternode=%s  nProtocolVersion=%d\n", outpoint.ToStringShort(), nProtocolVersion);
-        nActiveState = MASTERNODE_UPDATE_REQUIRED;nProtocolVersion);
+        nActiveState = MASTERNODE_UPDATE_REQUIRED;
         return false;
     }
 
@@ -529,7 +529,7 @@ bool CMasternodeBroadcast::Update(CMasternode* pmn, int& nDos, CConnman* connman
 
     // IsVnAssociatedWithPubkey is validated once in CheckOutpoint, after that they just need to match
     if(pmn->pubKeyCollateralAddress != pubKeyCollateralAddress) {
-        LogPrint(MCLog::MN, "CMasternodeBroadcast::Update -- Got mismatched pubKeyCollateralAddress and vin\n");
+        LogPrint(MCLog::MN, "CMasternodeBroadcast::Update -- Got mismatched pubKeyCollateralAddress and outpoint\n");
         nDos = 33;
         return false;
     }
@@ -665,7 +665,7 @@ bool CMasternodeBroadcast::CheckSignature(int& nDos) const
     uint256 hash = GetSignatureHash();
     if (!CHashSigner::VerifyHash(hash, pubKeyCollateralAddress, vchSig, strError)) {
         // maybe it's in old format
-        std::string strMessage = addr.ToString(false) + boost::lexical_cast<std::string>(sigTime) +
+        std::string strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) +
                         pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() +
                         boost::lexical_cast<std::string>(nProtocolVersion);
 
@@ -830,7 +830,7 @@ bool CMasternodePing::CheckAndUpdate(CMasternode* pmn, bool fFromNewBroadcast, i
 
     LogPrint(MCLog::MN, "CMasternodePing::CheckAndUpdate -- New ping: masternode=%s  blockHash=%s  sigTime=%d\n", masternodeOutpoint.ToStringShort(), blockHash.ToString(), sigTime);
 
-    //LogPrint(MCLog::MN, "mnping - Found corresponding mn for vin: %s\n", masternodeOutpoint.ToStringShort());
+    //LogPrint(MCLog::MN, "mnping - Found corresponding mn for outpoint: %s\n", masternodeOutpoint.ToStringShort());
     // update only if there is no known ping for this masternode or
     // last ping was more then MASTERNODE_MIN_MNP_SECONDS-60 ago comparing to this one
     if (pmn->IsPingedWithin(MASTERNODE_MIN_MNP_SECONDS - 60, sigTime)) {
