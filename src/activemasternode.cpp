@@ -184,7 +184,7 @@ void CActiveMasternode::ManageStateInitial(CConnman* connman)
 
     // Check socket connectivity
     LogPrint(MCLog::MN, "CActiveMasternode::ManageStateInitial -- Checking inbound connection to '%s'\n", service.ToString());
-    SOCKET hSocket;
+    SOCKET hSocket = CreateSocket(addrConnect);
     bool fConnected = ConnectSocketDirectly(service, hSocket, nConnectTimeout) && IsSelectableSocket(hSocket);
     CloseSocket(hSocket);
 
