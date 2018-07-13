@@ -490,7 +490,7 @@ bool CMasternodeBlockPayees::HasPayeeWithVotes(const CScript& payeeIn, int nVote
     return false;
 }
 
-bool CMasternodeBlockPayees::IsTransactionValid(const CTransactionRef& txNew, CAmount blockReward) const
+bool CMasternodeBlockPayees::IsTransactionValid(const CTransactionRef& txNew, int nBlockHeight, CAmount blockReward) const
 {
     LOCK(cs_vecPayees);
 
@@ -512,7 +512,7 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransactionRef& txNew, CA
 
     for (const auto& payee : vecPayees) {
         if (payee.GetVoteCount() >= MNPAYMENTS_SIGNATURES_REQUIRED) {
-            for (const auto& txout : txNew.vout) {
+            for (const auto& txout : txNew->vout) {
                 if (payee.GetPayee() == txout.scriptPubKey && txout.nValue >= nMasternodePayment && txout.nValue <= (nMasternodePayment + CAmount(10000000))) {
                     LogPrint(MCLog::MN, "CMasternodeBlockPayees::IsTransactionValid -- Found required payment\n");
                     return true;
