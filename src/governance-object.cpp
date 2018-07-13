@@ -264,17 +264,29 @@ bool CGovernanceObject::Sign(const CKey& keyMasternode, const CPubKey& pubKeyMas
 {
 std::string strError;
  
-    // if (sporkManager.IsSporkActive(SPORK_6_NEW_SIGS)) { -- YES IT IS
-    uint256 hash = GetSignatureHash();
+    if (chainActive.Height() > 543000) {
+        uint256 hash = GetSignatureHash();
 
-    if (!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
-        LogPrintf("CGovernanceObject::Sign -- SignHash() failed\n");
-        return false;
-    }
+        if (!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
+            LogPrintf("CGovernanceObject::Sign -- SignHash() failed\n");
+            return false;
+        }
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        LogPrintf("CGovernanceObject::Sign -- VerifyHash() failed, error: %s\n", strError);
-        return false;
+        if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
+            LogPrintf("CGovernanceObject::Sign -- VerifyHash() failed, error: %s\n", strError);
+            return false;
+        }
+    } else {
+        std::string strMessage = GetSignatureMessage();
+        if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
+            LogPrintf("CGovernanceObject::Sign -- SignMessage() failed\n");
+            return false;
+        }
+
+        if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+            LogPrintf("CGovernanceObject::Sign -- VerifyMessage() failed, error: %s\n", strError);
+            return false;
+        }
     }
 
      LogPrint(MCLog::GOV, "CGovernanceObject::Sign -- pubkey id = %s, masternode = %s\n",
@@ -287,17 +299,26 @@ bool CGovernanceObject::CheckSignature(const CPubKey& pubKeyMasternode) const
 {
     std::string strError;
 
-    uint256 hash = GetSignatureHash();
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        // could be an old object
-        std::string strMessage = GetSignatureMessage();
-        if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
-            // nope, not in old format either
-            LogPrintf("CGovernance::CheckSignature -- VerifyMessage() failed, error: %s\n", strError);
-            return false;
+    if (chainActive.Height() > 543000) {
+        uint256 hash = GetSignatureHash();
+        if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
+            // could be an old object
+            std::string strMessage = GetSignatureMessage();
+            if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+                // nope, not in old format either
+                LogPrintf("CGovernance::CheckSignature -- VerifyMessage() failed, error: %s\n", strError);
+                return false;
+            }
+        } else {
+            std::string strMessage = GetSignatureMessage();
+            if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+                LogPrintf("CGovernance::CheckSignature -- VerifyMessage() failed, error: %s\n", strError);
+                return false;
+            }
         }
     } else {
         std::string strMessage = GetSignatureMessage();
+
         if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
             LogPrintf("CGovernance::CheckSignature -- VerifyMessage() failed, error: %s\n", strError);
             return false;

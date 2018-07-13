@@ -158,16 +158,32 @@ uint256 CGovernanceVote::GetSignatureHash() const
 bool CGovernanceVote::Sign(const CKey& keyMasternode, const CPubKey& pubKeyMasternode)
 {
     std::string strError;
-    uint256 hash = GetSignatureHash();
+    
+    if (chainActive.Height() > 543000) {
+        uint256 hash = GetSignatureHash();
 
-    if(!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
-        LogPrintf("CGovernanceVote::Sign -- SignHash() failed\n");
-        return false;
-    }
+        if(!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
+            LogPrintf("CGovernanceVote::Sign -- SignHash() failed\n");
+            return false;
+        }
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        LogPrintf("CGovernanceVote::Sign -- VerifyHash() failed, error: %s\n", strError);
-        return false;
+        if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
+            LogPrintf("CGovernanceVote::Sign -- VerifyHash() failed, error: %s\n", strError);
+            return false;
+        }
+    } else {
+        std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|" +
+            boost::lexical_cast<std::string>(nVoteSignal) + "|" + boost::lexical_cast<std::string>(nVoteOutcome) + "|" + boost::lexical_cast<std::string>(nTime);
+
+        if(!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
+            LogPrintf("CGovernanceVote::Sign -- SignMessage() failed\n");
+            return false;
+        }
+
+        if(!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+            LogPrintf("CGovernanceVote::Sign -- VerifyMessage() failed, error: %s\n", strError);
+            return false;
+        }
     }
 
     return true;
@@ -177,17 +193,29 @@ bool CGovernanceVote::CheckSignature(const CPubKey& pubKeyMasternode) const
 {
     std::string strError;
 
-    uint256 hash = GetSignatureHash();
+    if (chainActive.Height() > 543000) {
+        uint256 hash = GetSignatureHash();
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        // could be a signature in old format
+        if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
+            // could be a signature in old format
+            std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|" +
+                boost::lexical_cast<std::string>(nVoteSignal) + "|" +
+                boost::lexical_cast<std::string>(nVoteOutcome) + "|" +
+                boost::lexical_cast<std::string>(nTime);
+
+            if(!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+                // nope, not in old format either
+                LogPrint(MCLog::GOV, "CGovernanceVote::IsValid -- VerifyMessage() failed, error: %s\n", strError);
+                return false;
+            }
+        }
+    } else {
         std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|" +
             boost::lexical_cast<std::string>(nVoteSignal) + "|" +
             boost::lexical_cast<std::string>(nVoteOutcome) + "|" +
             boost::lexical_cast<std::string>(nTime);
 
         if(!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
-            // nope, not in old format either
             LogPrint(MCLog::GOV, "CGovernanceVote::IsValid -- VerifyMessage() failed, error: %s\n", strError);
             return false;
         }
