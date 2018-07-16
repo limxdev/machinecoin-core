@@ -43,8 +43,7 @@ CMasternode::CMasternode(const CMasternode& other) :
 
 CMasternode::CMasternode(const CMasternodeBroadcast& mnb) :
     masternode_info_t{ mnb.nActiveState, mnb.nProtocolVersion, mnb.sigTime,
-                       mnb.outpoint, mnb.addr, mnb.pubKeyCollateralAddress, mnb.pubKeyMasternode,
-                       mnb.sigTime },
+                       mnb.outpoint, mnb.addr, mnb.pubKeyCollateralAddress, mnb.pubKeyMasternode },
     lastPing(mnb.lastPing),
     vchSig(mnb.vchSig)
 {}
