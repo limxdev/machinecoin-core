@@ -132,10 +132,12 @@ struct masternode_info_t
 
     masternode_info_t(int activeState, int protoVer, int64_t sTime,
                       COutPoint const& outpnt, CService const& addr,
-                      CPubKey const& pkCollAddr, CPubKey const& pkMN) :
+                      CPubKey const& pkCollAddr, CPubKey const& pkMN,
+                      int64_t tWatchdogV = 0) :
         nActiveState{activeState}, nProtocolVersion{protoVer}, sigTime{sTime},
         outpoint{outpnt}, addr{addr},
-        pubKeyCollateralAddress{pkCollAddr}, pubKeyMasternode{pkMN} {}
+        pubKeyCollateralAddress{pkCollAddr}, pubKeyMasternode{pkMN},
+        0 {}
 
     int nActiveState = 0;
     int nProtocolVersion = 0;
