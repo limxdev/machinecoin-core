@@ -1929,7 +1929,6 @@ bool AppInitMain()
 void ThreadCheckMasternode(CConnman* connman)
 {
     if(fLiteMode) return; // disable all Machinecoin specific functionality
-    if(!fMasternodeMode) return; // only run on masternodes
 
     static bool fOneThread;
     if(fOneThread) return;
@@ -1953,6 +1952,9 @@ void ThreadCheckMasternode(CConnman* connman)
 
             // make sure to check all masternodes first
             mnodeman.Check();
+            
+            mnodeman.ProcessPendingMnbRequests(connman);
+            mnodeman.ProcessPendingMnvRequests(connman);
 
             // check if we should activate or ping every few minutes,
             // slightly postpone first run to give net thread a chance to connect to some peers
@@ -1960,8 +1962,10 @@ void ThreadCheckMasternode(CConnman* connman)
                 activeMasternode.ManageState(connman);
 
             if(nTick % 60 == 0) {
+                netfulfilledman.CheckAndRemove();
                 mnodeman.ProcessMasternodeConnections(connman);
                 mnodeman.CheckAndRemove(connman);
+                mnodeman.WarnMasternodeDaemonUpdates();
                 mnpayments.CheckAndRemove();
             }
             if(fMasternodeMode && (nTick % (60 * 5) == 0)) {
