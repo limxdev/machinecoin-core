@@ -1173,7 +1173,7 @@ void CMasternodeMan::SendVerifyReply(CNode* pnode, CMasternodeVerification& mnv,
 
     std::string strError;
 
-    if (chainActive.Height() > 543000) {
+    if (chainActive.Height() > 550000) {
         uint256 hash = mnv.GetSignatureHash1(blockHash);
         if(!CHashSigner::SignHash(hash, activeMasternode.keyMasternode, mnv.vchSig1)) {
             LogPrintf("CMasternodeMan::SendVerifyReply -- SignHash() failed\n");
@@ -1257,7 +1257,7 @@ void CMasternodeMan::ProcessVerifyReply(CNode* pnode, CMasternodeVerification& m
         for (auto& mnpair : mapMasternodes) {
             if(CAddress(mnpair.second.addr, NODE_NETWORK) == pnode->addr) {
                 bool fFound = false;
-                if (chainActive.Height() > 543000) {
+                if (chainActive.Height() > 550000) {
                     fFound = CHashSigner::VerifyHash(hash1, mnpair.second.pubKeyMasternode, mnv.vchSig1, strError);
                 } else {
                     fFound = CMessageSigner::VerifyMessage(mnpair.second.pubKeyMasternode, mnv.vchSig1, strMessage1, strError);
@@ -1281,7 +1281,7 @@ void CMasternodeMan::ProcessVerifyReply(CNode* pnode, CMasternodeVerification& m
 
                     std::string strError;
 
-                    if (chainActive.Height() > 543000) {
+                    if (chainActive.Height() > 550000) {
                         uint256 hash2 = mnv.GetSignatureHash2(blockHash);
 
                         if(!CHashSigner::SignHash(hash2, activeMasternode.keyMasternode, mnv.vchSig2)) {
@@ -1408,7 +1408,7 @@ void CMasternodeMan::ProcessVerifyBroadcast(CNode* pnode, const CMasternodeVerif
             return;
         }
 
-        if (chainActive.Height() > 543000) {
+        if (chainActive.Height() > 550000) {
             uint256 hash1 = mnv.GetSignatureHash1(blockHash);
             uint256 hash2 = mnv.GetSignatureHash2(blockHash);
 

@@ -644,7 +644,7 @@ bool CMasternodeBroadcast::Sign(const CKey& keyCollateralAddress)
 
     sigTime = GetAdjustedTime();
 
-    if (chainActive.Height() > 543000) {
+    if (chainActive.Height() > 550000) {
         uint256 hash = GetSignatureHash();
         if (!CHashSigner::SignHash(hash, keyCollateralAddress, vchSig)) {
             LogPrintf("CMasternodeBroadcast::Sign -- SignHash() failed\n");
@@ -678,7 +678,7 @@ bool CMasternodeBroadcast::CheckSignature(int& nDos) const
     std::string strError = "";
     nDos = 0;
 
-    if (chainActive.Height() > 543000) {
+    if (chainActive.Height() > 550000) {
         uint256 hash = GetSignatureHash();
         if (!CHashSigner::VerifyHash(hash, pubKeyCollateralAddress, vchSig, strError)) {
             // maybe it's in old format
@@ -728,7 +728,7 @@ void CMasternodeBroadcast::Relay(CConnman* connman) const
 uint256 CMasternodePing::GetHash() const
 {
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
-    if (chainActive.Height() > 543000) {
+    if (chainActive.Height() > 550000) {
         ss << masternodeOutpoint;
         ss << blockHash;
         ss << sigTime;
@@ -766,7 +766,7 @@ bool CMasternodePing::Sign(const CKey& keyMasternode, const CPubKey& pubKeyMaste
 
     sigTime = GetAdjustedTime();
 
-    if (chainActive.Height() > 543000) {
+    if (chainActive.Height() > 550000) {
         uint256 hash = GetSignatureHash();
         if (!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
             LogPrintf("CMasternodePing::Sign -- SignHash() failed\n");
@@ -800,7 +800,7 @@ bool CMasternodePing::CheckSignature(const CPubKey& pubKeyMasternode, int &nDos)
     std::string strError = "";
     nDos = 0;
 
-    if (chainActive.Height() > 543000) {
+    if (chainActive.Height() > 550000) {
         uint256 hash = GetSignatureHash();
 
         if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
