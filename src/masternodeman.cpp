@@ -853,7 +853,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
 
         COutPoint masternodeOutpoint;
 
-        if (pfrom->nVersion == 70018) {
+        if (pfrom->nVersion <= 70018) {
             CTxIn vin;
             vRecv >> vin;
             masternodeOutpoint = vin.prevout;
