@@ -110,7 +110,7 @@ void CMasternodeMan::AskForMN(CNode* pnode, const COutPoint& outpoint, CConnman*
     mWeAskedForMasternodeListEntry[outpoint][addrSquashed] = GetTime() + DSEG_UPDATE_SECONDS;
 
     const CNetMsgMaker msgMaker(pnode->GetSendVersion());
-    if (pnode->GetSendVersion() == 70018) {
+    if (chainActive.Height() > 550000) {
         connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSEG, CTxIn(outpoint)));
     } else {
         connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSEG, outpoint));
@@ -396,7 +396,7 @@ void CMasternodeMan::DsegUpdate(CNode* pnode, CConnman* connman)
     }
   
     const CNetMsgMaker msgMaker(pnode->GetSendVersion());
-    if (pnode->GetSendVersion() == 70018) {
+    if (chainActive.Height() > 550000) {
         connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSEG, CTxIn()));
     } else {
         connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSEG, COutPoint()));
@@ -853,7 +853,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
 
         COutPoint masternodeOutpoint;
 
-        if (pfrom->nVersion <= 70018) {
+        if (pfrom->chainActive.Height() > 550000) {
             CTxIn vin;
             vRecv >> vin;
             masternodeOutpoint = vin.prevout;
@@ -1601,7 +1601,7 @@ bool CMasternodeMan::IsSentinelPingActive()
 
 bool CMasternodeMan::AddGovernanceVote(const COutPoint& outpoint, uint256 nGovernanceObjectHash)
 {
-    LOCK2(cs_main, cs);
+    LOCK(cs);
     CMasternode* pmn = Find(outpoint);
     if(!pmn) {
         return false;
@@ -1612,7 +1612,7 @@ bool CMasternodeMan::AddGovernanceVote(const COutPoint& outpoint, uint256 nGover
 
 void CMasternodeMan::RemoveGovernanceObject(uint256 nGovernanceObjectHash)
 {
-    LOCK(cs);
+    LOCK2(cs_main, cs);
     for(auto& mnpair : mapMasternodes) {
         mnpair.second.RemoveGovernanceObject(nGovernanceObjectHash);
     }
