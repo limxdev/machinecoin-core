@@ -31,6 +31,8 @@
 #include <utilmoneystr.h>
 #include <utilstrencodings.h>
 
+#include <memory>
+
 #include <governance.h>
 #include <masternode-payments.h>
 #include <masternode-sync.h>
