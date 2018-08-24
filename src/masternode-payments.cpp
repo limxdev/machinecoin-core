@@ -367,7 +367,7 @@ bool CMasternodePaymentVote::Sign()
 {
     std::string strError;
     
-    if (chainActive.Height() > 580000) {
+    if (chainActive.Height() > 600000) {
         uint256 hash = GetSignatureHash();
 
         if(!CHashSigner::SignHash(hash, activeMasternode.keyMasternode, vchSig)) {
@@ -814,7 +814,7 @@ bool CMasternodePaymentVote::CheckSignature(const CPubKey& pubKeyMasternode, int
 
     std::string strError = "";
     
-    if (chainActive.Height() > 580000) {
+    if (chainActive.Height() > 600000) {
         uint256 hash = GetSignatureHash();
 
         if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
