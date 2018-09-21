@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2018 The Machinecoin Core developers
+// Copyright (c) 2009-2017 The Machinecoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -81,7 +81,7 @@ static int verify_script(const unsigned char *scriptPubKey, unsigned int scriptP
                                     unsigned int nIn, unsigned int flags, machinecoinconsensus_error* err)
 {
     if (!verify_flags(flags)) {
-        return machinecoinconsensus_ERR_INVALID_FLAGS;
+        return set_error(err, machinecoinconsensus_ERR_INVALID_FLAGS);
     }
     try {
         TxInputStream stream(SER_NETWORK, PROTOCOL_VERSION, txTo, txToLen);

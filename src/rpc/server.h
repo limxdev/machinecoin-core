@@ -27,9 +27,6 @@ namespace RPCServer
     void OnStopped(std::function<void ()> slot);
 }
 
-class CBlockIndex;
-class CNetAddr;
-
 /** Wrapper for UniValue::VType, which includes typeAny:
  * Used to denote don't care type. Only used by RPCTypeCheckObj */
 struct UniValueType {

@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 The Machinecoin Core developers
+// Copyright (c) 2015-2017 The Machinecoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -122,9 +122,7 @@ class HTTPClosure
 {
 public:
     virtual void operator()() = 0;
-    virtual ~HTTPClosure() {};
-    
-    std::string path;
+    virtual ~HTTPClosure() {}
 };
 
 /** Event class. This can be used either as a cross-thread trigger or as a timer.

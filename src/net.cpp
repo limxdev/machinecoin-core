@@ -370,10 +370,6 @@ static CAddress GetBindAddress(SOCKET sock)
 
 CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCountFailure)
 {
-    if (!fNetworkActive) {
-        return nullptr;
-    }
-
     if (pszDest == nullptr) {
         if (IsLocal(addrConnect))
             return nullptr;
@@ -3001,6 +2997,6 @@ CSipHasher CConnman::GetDeterministicRandomizer(uint64_t id) const
 uint64_t CConnman::CalculateKeyedNetGroup(const CAddress& ad) const
 {
     std::vector<unsigned char> vchNetGroup(ad.GetGroup());
-    
+
     return GetDeterministicRandomizer(RANDOMIZER_ID_NETGROUP).Write(vchNetGroup.data(), vchNetGroup.size()).Finalize();
 }

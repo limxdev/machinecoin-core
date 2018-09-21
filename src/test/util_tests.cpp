@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011-2017 The Machinecoin Core developers
+// Copyright (c) 2011-2017 The Machinecoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <vector>
 #ifndef WIN32
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #endif

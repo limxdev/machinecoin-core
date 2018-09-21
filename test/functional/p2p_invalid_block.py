@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Copyright (c) 2015-2017 The Machinecoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -95,7 +95,18 @@ class InvalidBlockRequestTest(ComparisonTestFramework):
         assert(block2_orig.vtx != block2.vtx)
 
         self.tip = block2.sha256
-        yield TestInstance([[block2, RejectResult(16, b'bad-txns-duplicate')], [block2_orig, True]])
+        yield TestInstance([[block2, RejectResult(16, b'bad-txns-duplicate')]])
+
+        # Check transactions for duplicate inputs
+        self.log.info("Test duplicate input block.")
+
+        block2_dup = copy.deepcopy(block2_orig)
+        block2_dup.vtx[2].vin.append(block2_dup.vtx[2].vin[0])
+        block2_dup.vtx[2].rehash()
+        block2_dup.hashMerkleRoot = block2_dup.calc_merkle_root()
+        block2_dup.rehash()
+        block2_dup.solve()
+        yield TestInstance([[block2_dup, RejectResult(16, b'bad-txns-inputs-duplicate')], [block2_orig, True]])
         height += 1
 
         '''

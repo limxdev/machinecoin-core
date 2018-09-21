@@ -1,4 +1,4 @@
-﻿// Automatically generated file. Do not modify.
+// Automatically generated file. Do not modify.
 #ifndef MACHINECOIN_UNIVALUE_UNIVALUE_ESCAPES_H
 #define MACHINECOIN_UNIVALUE_UNIVALUE_ESCAPES_H
 static const char *escapes[256] = {

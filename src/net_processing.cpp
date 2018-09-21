@@ -1901,7 +1901,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             // Mark this node as currently connected, so we update its timestamp later.
             LOCK(cs_main);
             State(pfrom->GetId())->fCurrentlyConnected = true;
-            LogPrint(MCLog::NET, "New outbound peer connected: version: %d, blocks=%d, peer=%d%s\n",
+            LogPrintf("New outbound peer connected: version: %d, blocks=%d, peer=%d%s\n",
                       pfrom->nVersion.load(), pfrom->nStartingHeight, pfrom->GetId(),
                       (fLogIPs ? strprintf(", peeraddr=%s", pfrom->addr.ToString()) : ""));
         }

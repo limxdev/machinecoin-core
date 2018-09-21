@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Copyright (c) 2014-2017 The Machinecoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -177,6 +177,7 @@ class BaseNode(P2PInterface):
             self.last_message.pop("headers", None)
             self.recent_headers_announced = []
 
+
     def check_last_headers_announcement(self, headers):
         """Test whether the last headers announcements received are right.
            Headers may be announced across more than one message."""
@@ -199,10 +200,8 @@ class BaseNode(P2PInterface):
             compare_inv = []
             if "inv" in self.last_message:
                 compare_inv = [x.hash for x in self.last_message["inv"].inv]
-            
             assert_equal(compare_inv, inv)
             self.block_announced = False
-
             self.last_message.pop("inv", None)
 
 class SendHeadersTest(MachinecoinTestFramework):

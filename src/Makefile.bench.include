@@ -29,7 +29,7 @@ bench_bench_machinecoin_SOURCES = \
   bench/perf.h \
   bench/prevector_destructor.cpp
 
-nodist_bench_bench_machinecoin_SOURCES = $(GENERATED_TEST_FILES)
+nodist_bench_bench_machinecoin_SOURCES = $(GENERATED_BENCH_FILES)
 
 bench_bench_machinecoin_CPPFLAGS = $(AM_CPPFLAGS) $(MACHINECOIN_INCLUDES) $(EVENT_CLFAGS) $(EVENT_PTHREADS_CFLAGS) -I$(builddir)/bench/
 bench_bench_machinecoin_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)

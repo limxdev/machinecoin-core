@@ -1,4 +1,4 @@
-﻿package org.machinecoin;
+package org.machinecoin;
 
 import com.google.common.io.BaseEncoding;
 import java.util.Arrays;

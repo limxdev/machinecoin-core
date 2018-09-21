@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2017 The Machinecoin Core developers
+// Copyright (c) 2012-2017 The Machinecoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -82,10 +82,10 @@ bool static TestSplitHost(std::string test, std::string host, int port)
 
 BOOST_AUTO_TEST_CASE(netbase_splithost)
 {
-    BOOST_CHECK(TestSplitHost("www.machinecoin.io", "www.machinecoin.io", -1));
-    BOOST_CHECK(TestSplitHost("[www.machinecoin.io]", "www.machinecoin.io", -1));
-    BOOST_CHECK(TestSplitHost("www.machinecoin.io:80", "www.machinecoin.io", 80));
-    BOOST_CHECK(TestSplitHost("[www.machinecoin.io]:80", "www.machinecoin.io", 80));
+    BOOST_CHECK(TestSplitHost("https://machinecoin.io/", "https://machinecoin.io/", -1));
+    BOOST_CHECK(TestSplitHost("[https://machinecoin.io/]", "https://machinecoin.io/", -1));
+    BOOST_CHECK(TestSplitHost("https://machinecoin.io/:80", "https://machinecoin.io/", 80));
+    BOOST_CHECK(TestSplitHost("[https://machinecoin.io/]:80", "https://machinecoin.io/", 80));
     BOOST_CHECK(TestSplitHost("127.0.0.1", "127.0.0.1", -1));
     BOOST_CHECK(TestSplitHost("127.0.0.1:8333", "127.0.0.1", 8333));
     BOOST_CHECK(TestSplitHost("[127.0.0.1]", "127.0.0.1", -1));

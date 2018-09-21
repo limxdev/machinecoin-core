@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Copyright (c) 2014-2017 The Machinecoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -12,6 +12,7 @@ from test_framework.util import (
     assert_raises_rpc_error,
     sync_blocks,
 )
+
 
 class ReceivedByTest(MachinecoinTestFramework):
     def set_test_params(self):

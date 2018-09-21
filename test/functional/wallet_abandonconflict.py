@@ -63,7 +63,7 @@ class AbandonConflictTest(MachinecoinTestFramework):
         outputs[self.nodes[0].getnewaddress()] = Decimal("24.9996")
         signed2 = self.nodes[0].signrawtransaction(self.nodes[0].createrawtransaction(inputs, outputs))
         txABC2 = self.nodes[0].sendrawtransaction(signed2["hex"])
-        
+
         # Create a child tx spending ABC2
         signed3_change = Decimal("24.999")
         inputs = [ {"txid":txABC2, "vout":0} ]

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2018 The Machinecoin Core developers
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2017 The Machinecoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -442,6 +442,7 @@ int CommandLineRPC(int argc, char *argv[])
 
                         if (errMsg.isStr())
                             strPrint += "error message:\n"+errMsg.get_str();
+
                         if (errCode.isNum() && errCode.get_int() == RPC_WALLET_NOT_SPECIFIED) {
                             strPrint += "\nTry adding \"-rpcwallet=<filename>\" option to machinecoin-cli command line.";
                         }

@@ -11,7 +11,6 @@
 
 #include <addrman.h>
 #include <amount.h>
-#include <base58.h>
 #include <chain.h>
 #include <chainparams.h>
 #include <checkpoints.h>
@@ -77,10 +76,6 @@
 
 #if ENABLE_ZMQ
 #include <zmq/zmqnotificationinterface.h>
-#endif
-
-#ifdef USE_SSE2
-#include "crypto/scrypt.h"
 #endif
 
 bool fFeeEstimatesInitialized = false;
@@ -208,7 +203,7 @@ void Shutdown()
     FlushWallets();
 #endif
     MapPort(false);
-    
+
     // Because these depend on each-other, we make sure that neither can be
     // using the other before destroying them.
     if (peerLogic) UnregisterValidationInterface(peerLogic.get());
@@ -229,6 +224,7 @@ void Shutdown()
     }
 
     StopTorControl();
+
     // After everything has been shut down, but before things get flushed, stop the
     // CScheduler/checkqueue threadGroup
     threadGroup.interrupt_all();
@@ -249,7 +245,7 @@ void Shutdown()
             LogPrintf("%s: Failed to write fee estimates to %s\n", __func__, est_path.string());
         fFeeEstimatesInitialized = false;
     }
-    
+
     // FlushStateToDisk generates a SetBestChain callback, which we should avoid missing
     if (pcoinsTip != nullptr) {
         FlushStateToDisk();
@@ -402,7 +398,7 @@ std::string HelpMessage(HelpMessageMode mode)
 #endif
     strUsage += HelpMessageOpt("-prune=<n>", strprintf(_("Reduce storage requirements by enabling pruning (deleting) of old blocks. This allows the pruneblockchain RPC to be called to delete specific blocks, and enables automatic pruning of old blocks if a target size in MiB is provided. This mode is incompatible with -txindex and -rescan. "
             "Warning: Reverting this setting requires re-downloading the entire blockchain. "
-            "(default: 0 = disable pruning blocks, 1 = allow manual pruning via RPC, >%u = automatically prune block files to stay under the specified target size in MiB)"), MIN_DISK_SPACE_FOR_BLOCK_FILES / 1024 / 1024));
+            "(default: 0 = disable pruning blocks, 1 = allow manual pruning via RPC, >=%u = automatically prune block files to stay under the specified target size in MiB)"), MIN_DISK_SPACE_FOR_BLOCK_FILES / 1024 / 1024));
     strUsage += HelpMessageOpt("-reindex-chainstate", _("Rebuild chain state from the currently indexed blocks"));
     strUsage += HelpMessageOpt("-reindex", _("Rebuild chain state and block index from the blk*.dat files on disk"));
 #ifndef WIN32
@@ -532,10 +528,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-whitelistforcerelay", strprintf(_("Force relay of transactions from whitelisted peers even if they violate local relay policy (default: %d)"), DEFAULT_WHITELISTFORCERELAY));
 
     strUsage += HelpMessageGroup(_("Block creation options:"));
-    if (showDebug)
-        strUsage += HelpMessageOpt("-blockmaxsize=<n>", "Set maximum BIP141 block weight to this * 4. Deprecated, use blockmaxweight");
     strUsage += HelpMessageOpt("-blockmaxweight=<n>", strprintf(_("Set maximum BIP141 block weight (default: %d)"), DEFAULT_BLOCK_MAX_WEIGHT));
-    strUsage += HelpMessageOpt("-blockmaxsize=<n>", _("Set maximum BIP141 block weight to this * 4. Deprecated, use blockmaxweight"));
     strUsage += HelpMessageOpt("-blockmintxfee=<amt>", strprintf(_("Set lowest fee rate (in %s/kB) for transactions to be included in block creation. (default: %s)"), CURRENCY_UNIT, FormatMoney(DEFAULT_BLOCK_MIN_TX_FEE)));
     if (showDebug)
         strUsage += HelpMessageOpt("-blockversion=<n>", "Override block version to test forking scenarios");
@@ -849,24 +842,6 @@ void InitParameterInteraction()
     if (gArgs.GetBoolArg("-whitelistforcerelay", DEFAULT_WHITELISTFORCERELAY)) {
         if (gArgs.SoftSetBoolArg("-whitelistrelay", true))
             LogPrintf("%s: parameter interaction: -whitelistforcerelay=1 -> setting -whitelistrelay=1\n", __func__);
-    }
-    
-    if (gArgs.IsArgSet("-blockmaxsize")) {
-        unsigned int max_size = gArgs.GetArg("-blockmaxsize", 0);
-        if (gArgs.SoftSetArg("blockmaxweight", strprintf("%d", max_size * WITNESS_SCALE_FACTOR))) {
-            LogPrintf("%s: parameter interaction: -blockmaxsize=%d -> setting -blockmaxweight=%d (-blockmaxsize is deprecated!)\n", __func__, max_size, max_size * WITNESS_SCALE_FACTOR);
-        } else {
-            LogPrintf("%s: Ignoring blockmaxsize setting which is overridden by blockmaxweight", __func__);
-        }
-    }
-
-    if (gArgs.IsArgSet("-blockmaxsize")) {
-        unsigned int max_size = gArgs.GetArg("-blockmaxsize", 0);
-        if (gArgs.SoftSetArg("blockmaxweight", strprintf("%d", max_size * WITNESS_SCALE_FACTOR))) {
-            LogPrintf("%s: parameter interaction: -blockmaxsize=%d -> setting -blockmaxweight=%d (-blockmaxsize is deprecated!)\n", __func__, max_size, max_size * WITNESS_SCALE_FACTOR);
-        } else {
-            LogPrintf("%s: Ignoring blockmaxsize setting which is overridden by blockmaxweight", __func__);
-        }
     }
 }
 
@@ -1339,11 +1314,6 @@ bool AppInitMain()
     }
 
     int64_t nStart;
-
-#if defined(USE_SSE2)
-    std::string sse2detect = scrypt_detect_sse2();
-    LogPrintf("%s\n", sse2detect);
-#endif
 
     // ********************************************************* Step 5: verify wallet database integrity
 #ifdef ENABLE_WALLET
@@ -1851,7 +1821,7 @@ bool AppInitMain()
     // ********************************************************* Step 11: start node
 
     int chain_active_height;
-        
+
     //// debug print
     {
         LOCK(cs_main);
@@ -1872,7 +1842,7 @@ bool AppInitMain()
     connOptions.nLocalServices = nLocalServices;
     connOptions.nMaxConnections = nMaxConnections;
     connOptions.nMaxOutbound = std::min(MAX_OUTBOUND_CONNECTIONS, connOptions.nMaxConnections);
-    connOptions.nMaxMasternodeOutbound = std::min(MAX_OUTBOUND_MASTERNODE_CONNECTIONS, connOptions.nMaxConnections);
+    connOptions.nMaxMasternodeOutbound = std::min(MAX_OUTBOUND_MASTERNODE_CONNECTIONS, connOptions.nMaxMasternodeOutbound);
     connOptions.nMaxAddnode = MAX_ADDNODE_CONNECTIONS;
     connOptions.nMaxFeeler = 1;
     connOptions.nBestHeight = chain_active_height;
