@@ -56,11 +56,11 @@ static const unsigned int MAX_PROTOCOL_MESSAGE_LENGTH = 4 * 1000 * 1000;
 /** Maximum length of strSubVer in `version` message */
 static const unsigned int MAX_SUBVERSION_LENGTH = 256;
 /** Maximum number of automatic outgoing nodes */
-static const int MAX_OUTBOUND_CONNECTIONS = 16;
-/** Maximum number if outgoing masternodes */
-static const int MAX_OUTBOUND_MASTERNODE_CONNECTIONS = 8;
+static const int MAX_OUTBOUND_CONNECTIONS = 8;
 /** Maximum number of addnode outgoing nodes */
 static const int MAX_ADDNODE_CONNECTIONS = 8;
+/** Maximum number if outgoing masternodes */
+static const int MAX_OUTBOUND_MASTERNODE_CONNECTIONS = 20;
 /** -listen default */
 static const bool DEFAULT_LISTEN = true;
 /** -upnp default */
@@ -132,7 +132,6 @@ public:
         ServiceFlags nLocalServices = NODE_NONE;
         int nMaxConnections = 0;
         int nMaxOutbound = 0;
-        int nMaxMasternodeOutbound = 0;
         int nMaxAddnode = 0;
         int nMaxFeeler = 0;
         int nBestHeight = 0;
@@ -154,7 +153,6 @@ public:
         nLocalServices = connOptions.nLocalServices;
         nMaxConnections = connOptions.nMaxConnections;
         nMaxOutbound = std::min(connOptions.nMaxOutbound, connOptions.nMaxConnections);
-        nMaxMasternodeOutbound = std::min(connOptions.nMaxMasternodeOutbound, connOptions.nMaxConnections);
         nMaxAddnode = connOptions.nMaxAddnode;
         nMaxFeeler = connOptions.nMaxFeeler;
         nBestHeight = connOptions.nBestHeight;
@@ -526,7 +524,6 @@ private:
     std::unique_ptr<CSemaphore> semAddnode;
     int nMaxConnections;
     int nMaxOutbound;
-    int nMaxMasternodeOutbound;
     int nMaxAddnode;
     int nMaxFeeler;
     std::atomic<int> nBestHeight;
